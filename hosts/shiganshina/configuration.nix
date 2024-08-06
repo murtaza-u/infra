@@ -69,7 +69,11 @@
   };
 
   # K3S.
-  services.k3s.enable = true;
+  services.k3s = {
+    enable = true;
+    extraFlags = "--tls-san k3s.murtazau.xyz --secrets-encryption";
+    serverAddr = "https://k3s.murtazau.xyz:6443";
+  };
 
   # Open ports in the firewall.
   networking.firewall.enable = true;
