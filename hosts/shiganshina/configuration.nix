@@ -68,8 +68,16 @@
     };
   };
 
+  # K3S.
+  services.k3s.enable = true;
+
   # Open ports in the firewall.
   networking.firewall.enable = true;
-  networking.firewall.allowedTCPPorts = [ 22 ];
+  networking.firewall.allowedTCPPorts = [
+    22 # ssh
+    80 # traefik http
+    443 # traefik https
+    6443 # kubernetes apiserver
+  ];
   # networking.firewall.allowedUDPPorts = [ ];
 }
