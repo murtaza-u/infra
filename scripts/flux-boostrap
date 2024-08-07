@@ -1,0 +1,19 @@
+#!/bin/sh
+
+if [[ -z "$(command -v flux)" ]]; then
+    echo "flux binary not found in PATH"
+    exit 1
+fi
+
+GITHUB_OWNER="murtaza-u"
+REPOSITORY="infra"
+BRANCH="main"
+CLUSTER="paradis"
+
+exec flux bootstrap github \
+  --token-auth \
+  --owner="$GITHUB_OWNER" \
+  --repository="$REPOSITORY" \
+  --branch="$BRANCH" \
+  --path="clusters/$CLUSTER" \
+  --personal
