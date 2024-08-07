@@ -22,6 +22,7 @@
         packages = with pkgs; [
           nixd
           nixpkgs-fmt
+          nixos-rebuild
           awscli2
           kubernetes-helm
           kubectl

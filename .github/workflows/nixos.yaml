@@ -33,10 +33,9 @@ jobs:
       - name: Install nix
         uses: cachix/install-nix-action@v27
 
-      # TODO: find a consistent way to make nixos-rebuild available.
       - name: Rebuild the new configuration and push it to remote
         run: |
-          nix run --impure nixpkgs#nixos-rebuild -- \
+          nix develop --impure --command nixos-rebuild \
             --flake .#shiganshina \
             --target-host shiganshina \
             --use-remote-sudo \
