@@ -1,39 +1,43 @@
+---
 name: NixOS continuous deployment pipeline
+
+# yamllint disable-line rule:truthy
 on:
   push:
     branches: main
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Set up SSH agent
-      uses: webfactory/ssh-agent@v0.9.0
-      with:
-        ssh-private-key: "${{ secrets.SSH_PRIVATE_KEY }}"
+      - name: Set up SSH agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: "${{ secrets.SSH_PRIVATE_KEY }}"
 
-    - name: Create SSH config directory
-      run: 'mkdir -p ~/.ssh'
+      - name: Create SSH config directory
+        run: 'mkdir -p ~/.ssh'
 
-    - name: Write custom SSH config from secret
-      run: 'echo "${{ secrets.SSH_CONFIG_FILE }}" > ~/.ssh/config'
+      - name: Write custom SSH config from secret
+        run: 'echo "${{ secrets.SSH_CONFIG_FILE }}" > ~/.ssh/config'
 
-    - name: Configure known hosts
-      run: 'echo "${{ secrets.SSH_KNOWN_HOST }}" > ~/.ssh/known_hosts'
+      - name: Configure known hosts
+        run: 'echo "${{ secrets.SSH_KNOWN_HOST }}" > ~/.ssh/known_hosts'
 
-    - name: Set SSH_CONFIG_FILE environment variable
-      run: 'export SSH_CONFIG_FILE=~/.ssh/config'
+      - name: Set SSH_CONFIG_FILE environment variable
+        run: 'export SSH_CONFIG_FILE=~/.ssh/config'
 
-    - name: Install nix
-      uses: cachix/install-nix-action@v27
+      - name: Install nix
+        uses: cachix/install-nix-action@v27
 
-    # TODO: find a consistent way to make nixos-rebuild available.
-    - name: Rebuild the new configuration and push it to remote
-      run: |
-        nix run --impure nixpkgs#nixos-rebuild -- \
-          --flake .#shiganshina \
-          --target-host shiganshina \
-          --use-remote-sudo \
-          switch
+      # TODO: find a consistent way to make nixos-rebuild available.
+      - name: Rebuild the new configuration and push it to remote
+        run: |
+          nix run --impure nixpkgs#nixos-rebuild -- \
+            --flake .#shiganshina \
+            --target-host shiganshina \
+            --use-remote-sudo \
+            switch

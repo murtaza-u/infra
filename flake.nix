@@ -26,6 +26,7 @@
           kubernetes-helm
           kubectl
           fluxcd
+          yamllint
         ];
       };
     };

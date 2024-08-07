@@ -1,0 +1,22 @@
+---
+name: Kubernetes CI tests
+
+# yamllint disable-line rule:truthy
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches: ["*"]
+
+jobs:
+  manifests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install nix
+        uses: cachix/install-nix-action@v27
+
+      - name: Lint YAML
+        run: "nix develop --command yamllint ."
