@@ -1,0 +1,34 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: minecraft-bedrock
+  namespace: default
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: ./charts/minecraft-bedrock
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+        namespace: flux-system
+  values:
+    service:
+      type: "LoadBalancer"
+    volumeClaimTemplateSpec:
+      storageClassName: "local-path"
+      resources:
+        requests:
+          storage: 2Gi
+    bedrockServer:
+      resources:
+        limits:
+          cpu: "1"
+    config:
+      eula: true
+      serverName: "Everything Everywhere All at Once"
+      gamemode: "survival"
+      allowCheats: true
+      allowList: true
+      allowListUsers: "MovingDystopia:2535424470278541,elvira3oo2:2535460113167288"
+      levelName: "everything-everywhere-all-at-once"
