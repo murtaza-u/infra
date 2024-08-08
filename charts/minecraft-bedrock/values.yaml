@@ -1,0 +1,300 @@
+---
+config:
+  # Must be set to true to accept the Minecraft End User License
+  # Agreement (https://minecraft.net/terms)
+  eula: false
+
+  # Allowed values: Any string without semicolon symbol.
+  #
+  # Used as the server name
+  serverName: "Dedicated Server"
+
+  # Allowed values: "survival", "creative", or "adventure"
+  #
+  # Sets the game mode for new players.
+  gamemode: "survival"
+
+  # Allowed values: true or false
+  #
+  # false prevents the server from sending to the client gamemode values
+  # other than the gamemode value saved by the server during world
+  # creation even if those values are set in server.properties after
+  # world creation.
+  #
+  # true forces the server to send to the client gamemode values other
+  # than the gamemode value saved by the server during world creation if
+  # those values are set in server.properties after world creation.
+  forceGamemode: true
+
+  # Allowed values: "peaceful", "easy", "normal", or "hard"
+  #
+  # Sets the difficulty of the world.
+  difficulty: "easy"
+
+  # Allowed values: "true" or "false"
+  #
+  # If true then cheats like commands can be used.
+  allowCheats: false
+
+  # Allowed values: Any positive integer
+  #
+  # The maximum number of players that can play on the server.
+  maxPlayers: 10
+
+  # Allowed values: "true" or "false"
+  #
+  # If true then all connected players must be authenticated to Xbox
+  # Live. Clients connecting to remote (non-LAN) servers always require
+  # Xbox Live authentication regardless of this setting. If the server
+  # accepts connections from the Internet, then it's highly recommended
+  # to enable online-mode.
+  onlineMode: true
+
+  # Allowed values: true or false
+  #
+  # If true then all connected players must be listed in
+  # `allowListUsers`.
+  #
+  # Set to false for public server.
+  allowList: true
+
+  # `allowList` must be set to true in order for to enforce this list of
+  # users.
+  #
+  # Example: "player1:1234567890,player2:0987654321"
+  #   Where player1 & player2 are xbox usernames and 1234567890 &
+  #   0987654321 are their XUID.
+  #
+  # You can lookup XUIDs here: https://mcprofile.io/
+  allowListUsers: ""
+
+  # Allowed values: true or false
+  #
+  # Listen and respond to clients that are looking for servers on the
+  # LAN. This causes the server to bind to the default ports (19132,
+  # 19133) even when `server-port` and `server-portv6` have non-default
+  # values. Consider turning this off if LAN discovery is not desirable,
+  # or when running multiple servers on the same host may lead to port
+  # conflicts.
+  enableLanVisibility: true
+
+  # Allowed values: Positive integer equal to 5 or greater.
+  #
+  # The maximum allowed view distance in number of chunks.
+  viewDistance: 32
+
+  # Allowed values: Integers in the range [4, 12]
+  #
+  # The world is ticked this many chunks away from any player.
+  tickDistance: 4
+
+  # Allowed values: Any non-negative integer.
+  #
+  # After a player has idled for this many minutes they are kicked. If
+  # set to 0 then players can idle indefinitely.
+  playerIdleTimeout: 30
+
+  # Allowed values: Any positive integer.
+  #
+  # Maximum number of threads the server tries to use. If set to 0 or
+  # removed then it uses as many as possible.
+  maxThreads: 8
+
+  # Allowed values: Any string without semicolon symbol or symbols
+  # illegal for file name: /\n\r\t\f`?*\\<>|\":
+  levelName: "Bedrock level"
+
+  # Allowed values: Any string
+  #
+  # Use to randomize the world.
+  levelSeed: ""
+
+  # Allowed values: FLAT, LEGACY, DEFAULT
+  levelType: "DEFAULT"
+
+  # Allowed values: "visitor", "member", "operator"
+  #
+  # Permission level for new players joining for the first time.
+  defaultPlayerPermissionLevel: "member"
+
+  # Used to define operators on the server.
+  #
+  # Example: "1234567890,0987654321"
+  #   Where 1234567890 & 0987654321 are XUIDs
+  #
+  # You can lookup XUIDs here: https://mcprofile.io/
+  ops: ""
+
+  # Used to define the members on the server.
+  #
+  # Example: "1234567890,0987654321"
+  #   Where 1234567890 & 0987654321 are XUIDs
+  #
+  # You can lookup XUIDs here: https://mcprofile.io/
+  members: ""
+
+  # Used to define visitors on the server.
+  #
+  # Example: "1234567890,0987654321"
+  #   Where 1234567890 & 0987654321 are XUIDs
+  #
+  # You can lookup XUIDs here: https://mcprofile.io/
+  visitors: ""
+
+  # Allowed values: "true" or "false"
+  #
+  # Force clients to use texture packs in the current world.
+  texturepackRequired: false
+
+  # Allowed values: "true" or "false"
+  #
+  # Enables logging content errors to a file.
+  contentLogFileEnabled: false
+
+  # Allowed values: 0-65535
+  #
+  # Determines the smallest size of raw network payload to compress
+  compressionThreshold: 1
+
+  # Allowed values: "zlib", "snappy"
+  #
+  # Determines the compression algorithm to use for networking.
+  compressionAlgorithm: "zlib"
+
+  # Allowed values: "client-auth", "server-auth", "server-auth-with-rewind".
+  #
+  # Enables server authoritative movement.
+  #
+  # If "server-auth", the server replays local user input on the server
+  # and sends down corrections when the client's position doesn't match
+  # the server's.
+  #
+  # If "server-auth-with-rewind" is enabled and the server sends a
+  # correction, the clients are instructed to rewind time back to the
+  # correction time, apply the correction, then replay all the player's
+  # inputs since then. This results in smoother and more frequent
+  # corrections.
+  #
+  # Corrections happen only if `correctPlayerMovement` is set to true.
+  serverAuthoritativeMovement: "server-auth"
+
+  # The number of incongruent time intervals needed before abnormal
+  # behavior is reported. Disabled by `serverAuthoritativeMovement`.
+  playerMovementScoreThreshold: 20
+
+  # Allowed values: Any value in the range of [0, 1] where 1 means that
+  # the direction of the players view and the direction the player is
+  # attacking must match exactly and a value of 0 means that the two
+  # directions can differ by up to and including 90 degrees.
+  #
+  # The amount that the player's attack direction and look direction can
+  # differ.
+  playerMovementActionDirectionThreshold: 0.85
+
+  # The difference between server and client positions that needs to be
+  # exceeded before abnormal behavior is detected. Disabled by
+  # `serverAuthoritativeMovement`.
+  playerMovementDistanceThreshold: 0.3
+
+  # The duration of time the server and client positions can be out of
+  # sync (as defined by player-movement-distance-threshold) before the
+  # abnormal movement score is incremented. This value is defined in
+  # milliseconds. Disabled by serverAuthoritativeMovement`.
+  playerMovementDurationThresholdInMs: 500
+
+  # Allowed values: true, false.
+  #
+  # If true, the client position gets corrected to the server position
+  # if the movement score exceeds the threshold.
+  correctPlayerMovement: false
+
+  # Allowed values: true, false.
+  #
+  # If true, the server computes block mining operations in sync with
+  # the client so it can verify that the client should be able to break
+  # blocks when it thinks it can.
+  serverAuthoritativeBlockBreaking: false
+
+  # Allowed values: "None", "Dropped", "Disabled"
+  #
+  # This represents the level of restriction applied to the chat for
+  # each player that joins the server. "None" is the default and
+  # represents regular free chat. "Dropped" means the chat messages are
+  # dropped and never sent to any client. Players receive a message to
+  # let them know the feature is disabled. "Disabled" means that unless
+  # the player is an operator, the chat UI does not even appear. No
+  # information is displayed to the player.
+  chatRestriction: "None"
+
+  # Allowed values: true, false.
+  #
+  # If true, the server informs clients that they should ignore other
+  # players when interacting with the world. This is not server
+  # authoritative.
+  disablePlayerInteraction: false
+
+  # Allowed values: true, false.
+  #
+  # If true, the server informs clients that they have the ability to
+  # generate visual level chunks outside of player interaction
+  # distances.
+  clientSideChunkGenerationEnabled: true
+
+  # Allowed values: true, false.
+  #
+  # If true, the server sends hashed block network IDs instead of IDs
+  # that start from 0 and go up. These IDs are stable and won't change
+  # regardless of other block changes.
+  blockNetworkIdsAreHashes: true
+
+  # Allowed values: true, false.
+  #
+  # If true, disable players customized skins that were customized
+  # outside of the Minecraft store assets or in game assets.  This is
+  # used to disable possibly offensive custom skins players make.
+  disableCustomSkins: false
+
+  # Allowed values: "Disabled" or any value in range [0.0, 1.0].
+  #
+  # If "Disabled" the server dynamically calculates how much of the
+  # player's view to generate, assigning the rest to the client to
+  # build. Otherwise from the overridden ratio tell the server how much
+  # of the player's view to generate, disregarding client hardware
+  # capability.
+  #
+  # Only valid if client-side-chunk-generation-enabled is enabled.
+  serverBuildRadiusRatio: "Disabled"
+
+  # Allowed values:
+  #   - 0 (Any / Normal)
+  #   - 1 (Game Directors / Operator)
+  #   - 2 (Admin / Host)
+  #   - 3 (Host / Automation)
+  #   - 4 (Owner / Admin)
+  #
+  # Sets the default permission level for ops when using /op.
+  opPermissionLevel: 4
+
+bedrockServer:
+  image:
+    tag: "2024.5.0"
+    pullPolicy: "IfNotPresent"
+  resources:
+    limits:
+      memory: "1Gi"
+      cpu: ""
+    requests:
+      memory: "250Mi"
+      cpu: "0.5"
+
+volumeClaimTemplateSpec:
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+service:
+  type: "NodePort" # or LoadBalancer if your infrastructure can provision one
+  nodePort: ""
