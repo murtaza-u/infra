@@ -1,0 +1,79 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "{{ .Release.Name }}"
+  namespace: "{{ .Release.Namespace }}"
+spec:
+  selector:
+    matchLabels:
+      app: "{{ .Release.Name }}"
+  serviceName: "{{ .Release.Name }}-svc"
+  replicas: 1 # since bedrock server is not horizontally scalable
+  template:
+    metadata:
+      labels:
+        app: "{{ .Release.Name }}"
+    spec:
+      terminationGracePeriodSeconds: 100
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault # enable seccomp and the runtimes default profile
+        runAsUser: 1001        # hardcode user to non-root if not set in Dockerfile
+        runAsGroup: 1001       # hardcode group to non-root if not set in Dockerfile
+        runAsNonRoot: true     # hardcode to non-root. Redundant to above if Dockerfile is set USER 1000
+      containers:
+        - name: "minecraft-bedrock-server"
+          image: "itzg/minecraft-bedrock-server:{{ .Values.bedrockServer.image.tag }}"
+          imagePullPolicy: "{{ .Values.bedrockServer.image.pullPolicy }}"
+          tty: true
+          stdin: true
+          envFrom:
+            - configMapRef:
+                name: "{{ .Release.Name }}-config"
+          ports:
+            - containerPort: 19132
+              name: bedrock
+              protocol: UDP
+          livenessProbe:
+            exec: &command
+              command:
+                - mc-monitor
+                - status-bedrock
+                - --host
+                - 127.0.0.1
+            initialDelaySeconds: 2
+            timeoutSeconds: 5
+            periodSeconds: 7
+            failureThreshold: 6
+          startupProbe:
+            exec: *command
+            periodSeconds: 10
+            failureThreshold: 30
+          resources:
+            limits:
+              memory: "{{ .Values.bedrockServer.resources.limits.memory }}"
+              {{- if .Values.bedrockServer.resources.limits.cpu -}}
+                cpu: "{{ .Values.bedrockServer.resources.limits.cpu }}"
+              {{- end }}
+            requests:
+              memory: "{{ .Values.bedrockServer.resources.requests.memory }}"
+              cpu: "{{ .Values.bedrockServer.resources.requests.cpu }}"
+          securityContext:
+            allowPrivilegeEscalation: false # prevent sudo, etc.
+            privileged: false               # prevent acting like host root
+          volumeMounts:
+            - name: data
+              mountPath: /data
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        storageClassName: "{{ .Values.volumeClaimTemplateSpec.storageClassName }}"
+        accessModes:
+          {{- range .Values.volumeClaimTemplateSpec.accessModes }}
+          - {{ . | quote }}
+          {{- end }}
+        resources:
+          requests:
+            storage: "{{ .Values.volumeClaimTemplateSpec.resources.requests.storage }}"

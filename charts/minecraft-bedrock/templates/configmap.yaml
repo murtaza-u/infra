@@ -1,0 +1,55 @@
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: "{{ .Release.Name }}-config"
+  namespace: "{{ .Release.Namespace }}"
+data:
+  EULA: "{{ .Values.config.eula }}"
+  SERVER_NAME: "{{ .Values.config.serverName }}"
+  GAMEMODE: "{{ .Values.config.gamemode }}"
+  FORCE_GAMEMODE: "{{ .Values.config.forceGamemode }}"
+  DIFFICULTY: "{{ .Values.config.difficulty }}"
+  ALLOW_CHEATS: "{{ .Values.config.allowCheats }}"
+  MAX_PLAYERS: "{{ .Values.config.maxPlayers }}"
+  ONLINE_MODE: "{{ .Values.config.onlineMode }}"
+  ALLOW_LIST: "{{ .Values.config.allowList }}"
+  ALLOW_LIST_USERS: "{{ .Values.config.allowListUsers }}"
+  ENABLE_LAN_VISIBILITY: "{{ .Values.config.enableLanVisibility }}"
+  VIEW_DISTANCE: "{{ .Values.config.viewDistance }}"
+  TICK_DISTANCE: "{{ .Values.config.tickDistance }}"
+  PLAYER_IDLE_TIMEOUT: "{{ .Values.config.playerIdleTimeout }}"
+  MAX_THREADS: "{{ .Values.config.maxThreads }}"
+  LEVEL_NAME: "{{ .Values.config.levelName }}"
+  {{- if .Values.config.levelSeed -}}
+    LEVEL_SEED: "{{ .Values.config.levelSeed }}"
+  {{- end }}
+  LEVEL_TYPE: "{{ .Values.config.levelType }}"
+  DEFAULT_PLAYER_PERMISSION_LEVEL: "{{ .Values.config.defaultPlayerPermissionLevel }}"
+  {{- if .Values.config.ops -}}
+    OPS: "{{ .Values.config.ops }}"
+  {{- end }}
+  {{- if .Values.config.members -}}
+    MEMBERS: "{{ .Values.config.members }}"
+  {{- end }}
+  {{- if .Values.config.visitors -}}
+    VISITORS: "{{ .Values.config.visitors }}"
+  {{- end }}
+  TEXTUREPACK_REQUIRED: "{{ .Values.config.texturepackRequired }}"
+  CONTENT_LOG_FILE_ENABLED: "{{ .Values.config.contentLogFileEnabled }}"
+  COMPRESSION_THRESHOLD: "{{ .Values.config.compressionThreshold }}"
+  COMPRESSION_ALGORITHM: "{{ .Values.config.compressionAlgorithm }}"
+  SERVER_AUTHORITATIVE_MOVEMENT: "{{ .Values.config.serverAuthoritativeMovement }}"
+  PLAYER_MOVEMENT_SCORE_THRESHOLD: "{{ .Values.config.playerMovementScoreThreshold }}"
+  PLAYER_MOVEMENT_ACTION_DIRECTION_THRESHOLD: "{{ .Values.config.playerMovementActionDirectionThreshold }}"
+  PLAYER_MOVEMENT_DISTANCE_THRESHOLD: "{{ .Values.config.playerMovementDistanceThreshold }}"
+  PLAYER_MOVEMENT_DURATION_THRESHOLD_IN_MS: "{{ .Values.config.playerMovementDurationThresholdInMs }}"
+  CORRECT_PLAYER_MOVEMENT: "{{ .Values.config.correctPlayerMovement }}"
+  SERVER_AUTHORITATIVE_BLOCK_BREAKING: "{{ .Values.config.serverAuthoritativeBlockBreaking }}"
+  CHAT_RESTRICTION: "{{ .Values.config.chatRestriction }}"
+  DISABLE_PLAYER_INTERACTION: "{{ .Values.config.disablePlayerInteraction }}"
+  CLIENT_SIDE_CHUNK_GENERATION_ENABLED: "{{ .Values.config.clientSideChunkGenerationEnabled }}"
+  BLOCK_NETWORK_IDS_ARE_HASHES: "{{ .Values.config.blockNetworkIdsAreHashes }}"
+  DISABLE_CUSTOM_SKINS: "{{ .Values.config.disableCustomSkins }}"
+  SERVER_BUILD_RADIUS_RATIO: "{{ .Values.config.serverBuildRadiusRatio }}"
+  OP_PERMISSION_LEVEL: "{{ .Values.config.opPermissionLevel }}"

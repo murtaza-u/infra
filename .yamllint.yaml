@@ -2,8 +2,11 @@
 extends: default
 ignore:
   - clusters/paradis/flux-system/
+  - charts/**/templates/
 rules:
   # 80 chars should be enough, but don't fail if a line is longer
   line-length:
     max: 80
     level: warning
+  comments:
+    min-spaces-from-content: 1
