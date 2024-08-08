@@ -4,7 +4,12 @@ name: NixOS continuous deployment pipeline
 # yamllint disable-line rule:truthy
 on:
   push:
-    branches: main
+    branches:
+      - main
+    paths:
+      - "flake.nix"
+      - "flake.lock"
+      - "hosts/**"
 
 jobs:
   deploy:
