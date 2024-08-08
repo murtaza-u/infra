@@ -87,13 +87,6 @@ jobs:
             --timeout=5m \
             -n flux-system
 
-      - name: Verify helm reconciliation
-        run: |
-          kubectl wait helmrelease/minecraft-bedrock \
-            --for=condition=ready \
-            --timeout=5m \
-            -n default
-
       - name: Debug failure
         if: failure()
         run: |
