@@ -28,6 +28,7 @@
           kubectl
           fluxcd
           yamllint
+          kubeconform
         ];
       };
     };

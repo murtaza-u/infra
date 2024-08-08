@@ -13,6 +13,10 @@ on:
     paths-ignore:
       - "hosts/**"
 
+env:
+  FLUX_VERSION: 2.3.0
+  FLUX_CRD_INSTALL_PATH: /tmp/flux-crd-schema
+
 jobs:
   manifests:
     runs-on: ubuntu-latest
@@ -25,3 +29,22 @@ jobs:
 
       - name: Lint YAML
         run: "nix develop --command yamllint ."
+
+      - name: Install flux CRD schema
+        run: |
+          mkdir -p /tmp/flux-crd-schema
+          curl -sL "https://github.com/fluxcd/flux2/releases/download/v$FLUX_VERSION/crd-schemas.tar.gz" |\
+            tar zxf - -C "$FLUX_CRD_INSTALL_PATH"
+
+      - name: Validate schema with kubeconform
+        run: |
+          while IFS= read -r -d $'\n' file; do
+            nix develop --ignore-environment --keep $FLUX_CRD_INSTALL_PATH \
+              --command kubeconform \
+                --strict \
+                --ignore-missing-schemas \
+                --schema-location default \
+                --schema-location "$FLUX_CRD_INSTALL_PATH" \
+                --verbose \
+                "$file"
+          done < <(find ./clusters -type f -name '*.yaml' -o -name "*.yml")
