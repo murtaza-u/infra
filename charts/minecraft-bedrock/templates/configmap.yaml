@@ -21,19 +21,19 @@ data:
   PLAYER_IDLE_TIMEOUT: "{{ .Values.config.playerIdleTimeout }}"
   MAX_THREADS: "{{ .Values.config.maxThreads }}"
   LEVEL_NAME: "{{ .Values.config.levelName }}"
-  {{- if .Values.config.levelSeed -}}
-    LEVEL_SEED: "{{ .Values.config.levelSeed }}"
+  {{- if .Values.config.levelSeed }}
+  LEVEL_SEED: "{{ .Values.config.levelSeed }}"
   {{- end }}
   LEVEL_TYPE: "{{ .Values.config.levelType }}"
   DEFAULT_PLAYER_PERMISSION_LEVEL: "{{ .Values.config.defaultPlayerPermissionLevel }}"
-  {{- if .Values.config.ops -}}
-    OPS: "{{ .Values.config.ops }}"
+  {{- if .Values.config.ops }}
+  OPS: "{{ .Values.config.ops }}"
   {{- end }}
-  {{- if .Values.config.members -}}
-    MEMBERS: "{{ .Values.config.members }}"
+  {{- if .Values.config.members }}
+  MEMBERS: "{{ .Values.config.members }}"
   {{- end }}
-  {{- if .Values.config.visitors -}}
-    VISITORS: "{{ .Values.config.visitors }}"
+  {{- if .Values.config.visitors }}
+  VISITORS: "{{ .Values.config.visitors }}"
   {{- end }}
   TEXTUREPACK_REQUIRED: "{{ .Values.config.texturepackRequired }}"
   CONTENT_LOG_FILE_ENABLED: "{{ .Values.config.contentLogFileEnabled }}"

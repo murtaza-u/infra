@@ -53,8 +53,8 @@ spec:
           resources:
             limits:
               memory: "{{ .Values.bedrockServer.resources.limits.memory }}"
-              {{- if .Values.bedrockServer.resources.limits.cpu -}}
-                cpu: "{{ .Values.bedrockServer.resources.limits.cpu }}"
+              {{- if .Values.bedrockServer.resources.limits.cpu }}
+              cpu: "{{ .Values.bedrockServer.resources.limits.cpu }}"
               {{- end }}
             requests:
               memory: "{{ .Values.bedrockServer.resources.requests.memory }}"
