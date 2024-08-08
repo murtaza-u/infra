@@ -5,8 +5,13 @@ name: Kubernetes CI tests
 on:
   workflow_dispatch:
   pull_request:
+    paths-ignore:
+      - "hosts/**"
   push:
-    branches: ["*"]
+    branches:
+      - "*"
+    paths-ignore:
+      - "hosts/**"
 
 jobs:
   manifests:
