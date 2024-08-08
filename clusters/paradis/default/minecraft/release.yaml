@@ -16,7 +16,6 @@ spec:
     service:
       type: "LoadBalancer"
     volumeClaimTemplateSpec:
-      storageClassName: "local-path"
       resources:
         requests:
           storage: 2Gi

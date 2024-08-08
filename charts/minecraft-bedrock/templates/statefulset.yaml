@@ -69,7 +69,9 @@ spec:
     - metadata:
         name: data
       spec:
+        {{- if .Values.volumeClaimTemplateSpec.storageClassName }}
         storageClassName: "{{ .Values.volumeClaimTemplateSpec.storageClassName }}"
+        {{- end }}
         accessModes:
           {{- range .Values.volumeClaimTemplateSpec.accessModes }}
           - {{ . | quote }}
