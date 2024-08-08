@@ -83,5 +83,7 @@
     443 # traefik https
     6443 # kubernetes apiserver
   ];
-  # networking.firewall.allowedUDPPorts = [ ];
+  networking.firewall.allowedUDPPorts = [
+    19132 # minecraft bedrock server
+  ];
 }
