@@ -71,7 +71,7 @@ jobs:
         run: |
           flux create source git flux-system \
             --url="${{ github.event.repository.html_url }}" \
-            --branch="${GITHUB_REF#refs/heads/}" \
+            --branch="${{ github.head_ref || github.ref_name }}" \
             --username="${GITHUB_ACTOR}" \
             --password="${{ secrets.GITHUB_TOKEN }}" \
             --ignore-paths="clusters/**/flux-system/"
@@ -80,12 +80,29 @@ jobs:
             --source=flux-system \
             --path=./clusters/paradis
 
-      - name: Verify cluster reconciliation
+      - name: Verify kustomization reconciliation
         run: |
           kubectl wait kustomization/flux-system \
             --for=condition=ready \
             --timeout=5m \
             -n flux-system
+
+          kubectl wait kustomization/cert-manager-controller \
+            --for=condition=ready \
+            --timeout=5m \
+            -n cert-manager
+
+          kubectl wait kustomization/cert-manager-issuer \
+            --for=condition=ready \
+            --timeout=5m \
+            -n cert-manager
+
+      - name: Verify helm reconciliation
+        run: |
+          kubectl wait helmrelease/cert-manager \
+            --for=condition=ready \
+            --timeout=5m \
+            -n cert-manager
 
       - name: Debug failure
         if: failure()
