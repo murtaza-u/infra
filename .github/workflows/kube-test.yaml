@@ -80,12 +80,22 @@ jobs:
             --source=flux-system \
             --path=./clusters/paradis
 
-      - name: Verify cluster reconciliation
+      - name: Verify kustomization reconciliation
         run: |
           kubectl wait kustomization/flux-system \
             --for=condition=ready \
             --timeout=5m \
             -n flux-system
+
+          kubectl wait kustomization/cert-manager-controller \
+            --for=condition=ready \
+            --timeout=5m \
+            -n cert-manager
+
+          kubectl wait kustomization/cert-manager-issuer \
+            --for=condition=ready \
+            --timeout=5m \
+            -n cert-manager
 
       - name: Verify helm reconciliation
         run: |
