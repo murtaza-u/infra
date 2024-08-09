@@ -32,3 +32,5 @@ spec:
     # disable prometheus until we have prometheus setup
     prometheus:
       enabled: false
+    crds:
+      enabled: true
