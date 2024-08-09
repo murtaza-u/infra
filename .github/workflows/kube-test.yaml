@@ -87,6 +87,13 @@ jobs:
             --timeout=5m \
             -n flux-system
 
+      - name: Verify helm reconciliation
+        run: |
+          kubectl wait helmrelease/cert-manager \
+            --for=condition=ready \
+            --timeout=5m \
+            -n cert-manager
+
       - name: Debug failure
         if: failure()
         run: |
