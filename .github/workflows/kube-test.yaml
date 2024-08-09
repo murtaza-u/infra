@@ -71,7 +71,7 @@ jobs:
         run: |
           flux create source git flux-system \
             --url="${{ github.event.repository.html_url }}" \
-            --branch="${GITHUB_REF#refs/heads/}" \
+            --branch="${{ github.head_ref || github.ref_name }}" \
             --username="${GITHUB_ACTOR}" \
             --password="${{ secrets.GITHUB_TOKEN }}" \
             --ignore-paths="clusters/**/flux-system/"
