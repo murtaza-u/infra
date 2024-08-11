@@ -1,0 +1,166 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kube-prometheus-stack
+  namespace: monitoring
+spec:
+  chart:
+    spec:
+      chart: kube-prometheus-stack
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus-community
+      version: 61.x.x
+  install:
+    crds: Create
+    createNamespace: true
+  interval: 10m0s
+  releaseName: kube-prometheus-stack
+  targetNamespace: monitoring
+  upgrade:
+    crds: Create
+  values:
+    namespaceOverride: monitoring
+    crds:
+      enabled: true
+    alertmanager:
+      enabled: false
+    grafana:
+      enabled: true
+      adminPassword: ihategrafana # TODO: use secret to store credentials
+      defaultDashboardsEditable: false
+      defaultDashboardsEnabled: true
+      defaultDashboardsTimezone: Asia/Kolkata # should probably use `utc`.
+      ingress:
+        enabled: true
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-staging
+        hosts:
+          - grafana.murtazau.xyz
+        ingressClassName: traefik
+        path: /
+        tls:
+          - hosts:
+              - grafana.murtazau.xyz
+            secretName: grafana-cert
+      namespaceOverride: monitoring
+      persistence:
+        accessModes:
+          - ReadWriteOnce
+        enabled: true
+        size: 3Gi
+        storageClassName: local-path
+      prune: true
+      resources:
+        limits:
+          cpu: 100m
+          memory: 400Mi
+        requests:
+          cpu: 50m
+          memory: 300Mi
+      sidecar:
+        dashboards:
+          enabled: true
+          multicluster:
+            etcd:
+              enabled: false
+            global:
+              enabled: false
+          provider:
+            allowUiUpdates: false
+          searchNamespace: ALL
+        datasources:
+          enabled: true
+          defaultDatasourceEnabled: true
+          alertmanager:
+            enabled: false
+    prometheusOperator:
+      enabled: true
+      resources:
+        limits:
+          cpu: 20m
+          memory: 60Mi
+        requests:
+          cpu: 10m
+          memory: 25Mi
+      revisionHistoryLimit: 4
+    prometheus:
+      enabled: true
+      prometheusSpec:
+        resources:
+          limits:
+            cpu: 120m
+            memory: 400Mi
+          requests:
+            cpu: 70m
+            memory: 300Mi
+        retention: 2d
+        retentionSize: ""
+        scrapeInterval: ""
+        scrapeTimeout: ""
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              accessModes:
+                - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 3Gi
+              storageClassName: local-path
+    kubernetesServiceMonitors:
+      enabled: true
+    defaultRules:
+      rules:
+        alertmanager: false
+        etcd: false
+        kubeControllerManager: false
+        kubeProxy: false
+        kubeSchedulerAlerting: false
+        kubeSchedulerRecording: false
+        windows: false
+    prometheus-node-exporter:
+      namespaceOverride: monitoring
+      resources:
+        limits:
+          cpu: 20m
+          memory: 50Mi
+        requests:
+          cpu: 10m
+          memory: 20Mi
+    kube-state-metrics:
+      namespaceOverride: monitoring
+      resources:
+        limits:
+          cpu: 20m
+          memory: 50Mi
+        requests:
+          cpu: 10m
+          memory: 20Mi
+    nodeExporter:
+      enabled: true
+      operatingSystems:
+        darwin:
+          enabled: false
+        linux:
+          enabled: true
+    windowsMonitoring:
+      enabled: false
+    coreDns:
+      enabled: true
+    kubeApiServer:
+      enabled: true
+    kubeControllerManager:
+      enabled: false
+    kubeEtcd:
+      enabled: false
+    kubeProxy:
+      enabled: false
+    kubeScheduler:
+      enabled: false
+    kubeStateMetrics:
+      enabled: true
+    kubelet:
+      enabled: true
+      namespace: kube-system
