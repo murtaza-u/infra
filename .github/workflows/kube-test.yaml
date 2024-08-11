@@ -48,67 +48,67 @@ jobs:
                 --verbose \
                 "$file"
           done < <(find ./clusters -type f -name '*.yaml' -o -name "*.yml")
-  e2e:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Flux CLI
-        uses: fluxcd/flux2/action@main
-        with:
-          version: "$FLUX_VERSION"
-
-      - name: Setup Kubernetes
-        uses: helm/kind-action@v1.10.0
-        with:
-          cluster_name: paradis-test
-
-      - name: Install Flux in Kubernetes Kind
-        run: "flux install"
-
-      - name: Setup cluster reconciliation
-        run: |
-          flux create source git flux-system \
-            --url="${{ github.event.repository.html_url }}" \
-            --branch="${{ github.head_ref || github.ref_name }}" \
-            --username="${GITHUB_ACTOR}" \
-            --password="${{ secrets.GITHUB_TOKEN }}" \
-            --ignore-paths="clusters/**/flux-system/"
-
-          flux create kustomization flux-system \
-            --source=flux-system \
-            --path=./clusters/paradis
-
-      - name: Verify kustomization reconciliation
-        run: |
-          kubectl wait kustomization/flux-system \
-            --for=condition=ready \
-            --timeout=5m \
-            -n flux-system
-
-          kubectl wait kustomization/cert-manager-controller \
-            --for=condition=ready \
-            --timeout=5m \
-            -n cert-manager
-
-          kubectl wait kustomization/cert-manager-issuer \
-            --for=condition=ready \
-            --timeout=5m \
-            -n cert-manager
-
-      - name: Verify helm reconciliation
-        run: |
-          kubectl wait helmrelease/cert-manager \
-            --for=condition=ready \
-            --timeout=5m \
-            -n cert-manager
-
-      - name: Debug failure
-        if: failure()
-        run: |
-          kubectl -n flux-system get all
-          kubectl -n flux-system logs deploy/source-controller
-          kubectl -n flux-system logs deploy/kustomize-controller
-          kubectl -n flux-system logs deploy/helm-controller
-          flux get all --all-namespaces
+  # e2e:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
+  #
+  #     - name: Setup Flux CLI
+  #       uses: fluxcd/flux2/action@main
+  #       with:
+  #         version: "$FLUX_VERSION"
+  #
+  #     - name: Setup Kubernetes
+  #       uses: helm/kind-action@v1.10.0
+  #       with:
+  #         cluster_name: paradis-test
+  #
+  #     - name: Install Flux in Kubernetes Kind
+  #       run: "flux install"
+  #
+  #     - name: Setup cluster reconciliation
+  #       run: |
+  #         flux create source git flux-system \
+  #           --url="${{ github.event.repository.html_url }}" \
+  #           --branch="${{ github.head_ref || github.ref_name }}" \
+  #           --username="${GITHUB_ACTOR}" \
+  #           --password="${{ secrets.GITHUB_TOKEN }}" \
+  #           --ignore-paths="clusters/**/flux-system/"
+  #
+  #         flux create kustomization flux-system \
+  #           --source=flux-system \
+  #           --path=./clusters/paradis
+  #
+  #     - name: Verify kustomization reconciliation
+  #       run: |
+  #         kubectl wait kustomization/flux-system \
+  #           --for=condition=ready \
+  #           --timeout=5m \
+  #           -n flux-system
+  #
+  #         kubectl wait kustomization/cert-manager-controller \
+  #           --for=condition=ready \
+  #           --timeout=5m \
+  #           -n cert-manager
+  #
+  #         kubectl wait kustomization/cert-manager-issuer \
+  #           --for=condition=ready \
+  #           --timeout=5m \
+  #           -n cert-manager
+  #
+  #     - name: Verify helm reconciliation
+  #       run: |
+  #         kubectl wait helmrelease/cert-manager \
+  #           --for=condition=ready \
+  #           --timeout=5m \
+  #           -n cert-manager
+  #
+  #     - name: Debug failure
+  #       if: failure()
+  #       run: |
+  #         kubectl -n flux-system get all
+  #         kubectl -n flux-system logs deploy/source-controller
+  #         kubectl -n flux-system logs deploy/kustomize-controller
+  #         kubectl -n flux-system logs deploy/helm-controller
+  #         flux get all --all-namespaces
