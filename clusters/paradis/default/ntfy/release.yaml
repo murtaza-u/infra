@@ -43,7 +43,7 @@ spec:
         memory: 70Mi
     storageSpec:
       accessModes:
-      - ReadWriteOnce
+        - ReadWriteOnce
       resources:
         requests:
           storage: 2Gi

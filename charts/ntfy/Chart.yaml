@@ -1,3 +1,4 @@
+---
 apiVersion: v2
 name: ntfy
 description: Helm chart for ntfy.sh server
