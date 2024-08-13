@@ -1,0 +1,248 @@
+---
+image:
+  tag: "v2.11.0"
+  pullPolicy: "IfNotPresent"
+
+# resources:
+#   limits:
+#     memory: "100Mi"
+#     cpu: "70m"
+#   requests:
+#     memory: "70Mi"
+#     cpu: "40m"
+
+storageSpec:
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+
+ingress:
+  enable: false
+  annotations: {}
+  ingressClassName: ""
+  host: ""
+  tls:
+    enable: false
+    secretName: ""
+
+config:
+  # Public facing base URL of the service
+  # (e.g. https://ntfy.sh or https://ntfy.example.com)
+  #
+  # This setting is required for any of the following features:
+  # - attachments (to return a download URL)
+  # - e-mail sending (for the topic URL in the email footer)
+  # - iOS push notifications for self-hosted servers (to calculate the Firebase poll_request topic)
+  # - Matrix Push Gateway (to validate that the pushkey is correct)
+  baseUrl: ""
+
+  # Listen address for the HTTP web server.
+  # Format: [<ip>]:<port>, e.g. "1.2.3.4:8080".
+  listenAddr: ":8080"
+
+  # Caching
+  #
+  # The "duration" parameter defines the duration for which messages will
+  # be buffered before they are deleted. This is required to support the
+  # "since=..." and "poll=1" parameter. To disable the cache entirely
+  # (on-disk/in-memory), set "duration" to 0. The cache file is created
+  # automatically, provided that the correct permissions are set.
+  #
+  # The "startupQueries" parameter allows you to run commands when the
+  # database is initialized, e.g. to enable WAL mode
+  # (see https://phiresky.github.io/blog/2020/sqlite-performance-tuning/)).
+  # Example:
+  #    startupQueries: |
+  #       pragma journal_mode = WAL;
+  #       pragma synchronous = normal;
+  #       pragma temp_store = memory;
+  #       pragma busy_timeout = 15000;
+  #       vacuum;
+  #
+  # The "batchSize" and "batchTimeout" parameter allow enabling
+  # async batch writing of messages. If set, messages will be queued and
+  # written to the database in batches of the given size, or after the given
+  # timeout. This is only required for high volume servers.
+  cache:
+    duration: "12h"
+    startupQueries:
+    batchSize: 0
+    batchTimeout: "0ms"
+
+  auth:
+    # Defines the default/fallback access if no access control entry is found;
+    # it can be set to "read-write" (default), "read-only", "write-only" or
+    # "deny-all".
+    defaultAccess: "deny-all"
+    # Allows you to run commands when the database is initialized, e.g. to
+    # enable WAL mode. This is similar to cache-startup-queries.
+    startupQueries:
+
+  # If enabled, clients can attach files to notifications as attachments.
+  # NOTE: `baseUrl` must be set above for attachments to work.
+  attachment:
+    # limit of the on-disk attachment cache directory (total size)
+    totalSizeLimit: "1G"
+    # per-file attachment size limit (e.g. 300k, 2M, 100M)
+    fileSizeLimit: "15M"
+    # duration after which uploaded attachments will be deleted (e.g. 3h, 20h)
+    expiryDuration: "3h"
+
+  # Interval in which the manager prunes old messages, deletes topics and
+  # prints the stats.
+  managerInterval: "1m"
+
+  # Defines topic names that are not allowed, because they are otherwise used.
+  # There are a few default topics that cannot be used (e.g. app, account,
+  # settings, ...). To extend the default list, define them here.
+  disallowed-topics: []
+
+  # Defines the root path of the web app, or disables the web app entirely.
+  #
+  # Can be any simple path, e.g. "/", "/app", or "/ntfy". For
+  # backwards-compatibility reasons, the values "app" (maps to "/"), "home"
+  # (maps to "/app"), or "disable" (maps to "") to disable the web app
+  # entirely.
+  webRoot: "disable"
+
+  # Various feature flags used to control the web app, and API access, mainly
+  # around user and account management.
+  #
+  # Allows users to sign up via the web app, or API
+  enableSignup: false
+  # Allows users to log in via the web app, or API
+  enableLogin: false
+  # Allows users to reserve topics (if their tier allows it)
+  enableReservations: false
+
+  # Server URL of a Firebase/APNS-connected ntfy server
+  # (likely "https://ntfy.sh").
+  #
+  # iOS users: If you use the iOS ntfy app, you MUST configure this to receive
+  # timely notifications. You'll like want this:
+  #
+  # If set, all incoming messages will publish a "poll_request" message to the
+  # configured upstream server, containing the message ID of the original
+  # message, instructing the iOS app to poll this server for the actual message
+  # contents. This is to prevent the upstream server and Firebase/APNS from
+  # being able to read the message.
+  #
+  # Base URL of the upstream server. Should be "https://ntfy.sh".
+  upstreamBaseUrl:
+  # Token used to authenticate with the upstream server. This is only required
+  # if you exceed the upstream rate limits, or the uptream server requires
+  # authentication.
+  upstreamAccessToken:
+
+  # Configures message-specific limits
+  #
+  # Defines the max size of a message body. Please note message sizes >4K are
+  # NOT RECOMMENDED, and largely untested. If FCM and/or APNS is used, the
+  # limit should stay 4K, because their limits are around that size. If you
+  # increase this size limit regardless, FCM and APNS will NOT work for large
+  # messages.
+  messageSizeLimit: "4k"
+  # Defines the max delay of a message when using the "Delay" header.
+  messageDelayLimit: "3d"
+
+  # Rate limiting: Total number of topics before the server rejects new topics.
+  globalTopicLimit: 15000
+
+  # Visitors
+  visitor:
+    # Rate limiting: Number of subscriptions per visitor (IP address)
+    subscriptionLimit: 30
+
+    # Rate limiting: Allowed GET/PUT/POST requests per second, per visitor:
+    #
+    # initial bucket of requests each visitor has
+    requestLimitBurst: 60
+    # rate at which the bucket is refilled
+    requestLimitReplenish: "5s"
+    # comma-separated list of hostnames, IPs or CIDRs to be exempt from request
+    # rate limiting. Hostnames are resolved at the time the server is started.
+    #
+    # Example: "1.2.3.4,ntfy.example.com,8.7.6.0/24"
+    requestLimitExemptHosts: ""
+
+    # Rate limiting: Hard daily limit of messages per visitor and day. The
+    # limit is reset every day at midnight UTC. If the limit is not set (or set
+    # to zero), the request limit (see above) governs the upper limit.
+    messageDailyLimit: 0
+
+    # Rate limiting: Attachment size and bandwidth limits per visitor:
+    #
+    # total storage limit used for attachments per visitor
+    attachmentTotalSizeLimit: "100M"
+    # total daily attachment download/upload traffic limit per visitor
+    attachmentDailyBandwidthLimit: "500M"
+
+    # Rate limiting: Enable subscriber-based rate limiting
+    # (mostly used for UnifiedPush)
+    #
+    # If subscriber-based rate limiting is enabled, messages published on
+    # UnifiedPush topics** (topics starting with "up") will be counted towards
+    # the "rate visitor" of the topic. A "rate visitor" is the first subscriber
+    # to the topic.
+    #
+    # Once enabled, a client subscribing to UnifiedPush topics via HTTP stream,
+    # or websockets, will be automatically registered as a "rate visitor", i.e.
+    # the visitor whose rate limits will be used when publishing on this topic.
+    # Note that setting the rate visitor requires **read-write permission** on
+    # the topic.
+    #
+    # If this setting is enabled, publishing to UnifiedPush topics will lead to
+    # a HTTP 507 response if no "rate visitor" has been previously registered.
+    # This is to avoid burning the publisher's "visitor-message-daily-limit".
+    subscriberRateLimiting: false
+
+  # Metrics
+  #
+  # ntfy can expose Prometheus-style metrics. Metrics may be considered
+  # sensitive information, so before you enable them, be sure you know what
+  # you are doing.
+  metrics:
+    enable: false
+
+  # Logging options
+  #
+  # By default, ntfy logs to the console (stderr), with an "info" log level,
+  # and in a human-readable text format. ntfy supports five different log
+  # levels, can also write to a file, log as JSON, and even supports granular
+  # log level overrides for easier debugging.
+  #
+  # Example (good for production):
+  #   log-level: info
+  #   log-format: json
+  #   log-file: /var/log/ntfy.log
+  log:
+    # Defines the default log level, can be one of "trace", "debug",
+    # "info"(default), "warn" or "error".
+    #
+    # Be aware that "debug" (and particularly "trace") can be VERY CHATTY. Only
+    # turn them on briefly for debugging purposes.
+    level: info
+    # Lets you override the log level if certain fields match. This is
+    # incredibly powerful for debugging certain parts of the system (e.g. only
+    # the account management, or only a certain visitor).
+    #
+    # This is an array of strings in the format:
+    #   - "field=value -> level" (to match a value exactly, e.g. "tag=manager -> trace")
+    #   - "field -> level" (to match any value, e.g. "time_taken_ms -> debug")
+    #
+    # Warning: Using log-level-overrides has a performance penalty. Only use it
+    # for temporary debugging.
+    #
+    # Example level overrides (for debugging, only use temporarily):
+    #   levelOverrides:
+    #     - "tag=manager -> trace"
+    #     - "visitor_ip=1.2.3.4 -> debug"
+    #     - "time_taken_ms -> debug"
+    levelOverrides: []
+    # Defines the output format, can be "text" (default) or "json"
+    format: text
+    # Filename to write logs to. If this is not set, ntfy logs to stderr.
+    file:

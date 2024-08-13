@@ -1,0 +1,85 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "{{ .Release.Name }}"
+  namespace: "{{ .Release.Namespace }}"
+spec:
+  selector:
+    matchLabels:
+      app: ntfy
+  serviceName: "{{ .Release.Name }}-svc"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ntfy
+    spec:
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        runAsUser: 1001
+        runAsGroup: 1001
+        runAsNonRoot: true
+      containers:
+        - name: ntfy
+          image: "binwiederhier/ntfy:{{ .Values.image.tag }}"
+          imagePullPolicy: "{{ .Values.image.pullPolicy }}"
+          args:
+            - serve
+          ports:
+            - containerPort: 8080
+              name: http-ntfy
+            {{- if .Values.config.metrics.enable }}
+            - containerPort: 9090
+              name: metrics-ntfy
+            {{- end }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/ntfy
+              readOnly: true
+            - name: data
+              mountPath: /data
+          {{- if .Values.resources }}
+          resources:
+            {{- if .Values.resources.requests }}
+            requests:
+              {{- if .Values.resources.requests.memory }}
+              memory: "{{ .Values.resources.requests.memory }}"
+              {{- end }}
+              {{- if .Values.resources.requests.cpu }}
+              cpu: "{{ .Values.resources.requests.cpu }}"
+              {{- end }}
+            {{- end }}
+            {{- if .Values.resources.limits }}
+            limits:
+              {{- if .Values.resources.limits.memory }}
+              memory: "{{ .Values.resources.limits.memory }}"
+              {{- end }}
+              {{- if .Values.resources.limits.cpu }}
+              cpu: "{{ .Values.resources.limits.cpu }}"
+              {{- end }}
+            {{- end }}
+          {{- end }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+      volumes:
+        - name: config
+          configMap:
+            name: "{{ .Release.Name }}-config"
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        {{- if .Values.storageSpec.storageClassName }}
+        storageClassName: "{{ .Values.storageSpec.storageClassName }}"
+        {{- end }}
+        accessModes:
+          {{- range .Values.storageSpec.accessModes }}
+          - {{ . | quote }}
+          {{- end }}
+        resources:
+          requests:
+            storage: "{{ .Values.storageSpec.resources.requests.storage }}"
