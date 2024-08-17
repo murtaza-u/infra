@@ -29,6 +29,7 @@
           fluxcd
           yamllint
           kubeconform
+          kubeseal
         ];
       };
     };
