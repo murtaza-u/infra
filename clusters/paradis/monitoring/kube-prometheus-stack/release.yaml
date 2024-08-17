@@ -26,7 +26,46 @@ spec:
     crds:
       enabled: true
     alertmanager:
-      enabled: false
+      enabled: true
+      config:
+        global:
+          resolve_timeout: 5m
+        route:
+          group_by: ['namespace']
+          group_wait: 30s
+          group_interval: 5m
+          repeat_interval: 12h
+          receiver: 'null'
+          routes:
+            - receiver: 'null'
+              matchers:
+                - alertname = "Watchdog"
+            - receiver: 'ntfy'
+        receivers:
+          - name: 'null'
+          - name: 'ntfy'
+            webhook_configs:
+              send_resolved: true
+              url: http://amify-svc.monitoring.svc.cluster.local/hook
+      alertmanagerSpec:
+        replicas: 1
+        retention: 72h
+        storage:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: "local-path"
+              accessModes:
+                - "ReadWriteOnce"
+              resources:
+                requests:
+                  storage: 3Gi
+        resources:
+          requests:
+            cpu: 50m
+            memory: 50Mi
+          limits:
+            cpu: 100m
+            memory: 100Mi
     grafana:
       enabled: true
       adminPassword: ihategrafana # TODO: use secret to store credentials
@@ -113,7 +152,6 @@ spec:
       enabled: true
     defaultRules:
       rules:
-        alertmanager: false
         etcd: false
         kubeControllerManager: false
         kubeProxy: false
