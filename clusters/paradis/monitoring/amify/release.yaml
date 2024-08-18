@@ -1,0 +1,56 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: amify
+  namespace: monitoring
+spec:
+  chart:
+    spec:
+      chart: ./helm
+      interval: 10m0s
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: GitRepository
+        name: amify
+  install:
+    createNamespace: true
+  interval: 10m0s
+  targetNamespace: monitoring
+  values:
+    replicaCount: 1
+    resources:
+      limits:
+        memory: "40Mi"
+        cpu: "50m"
+      requests:
+        memory: "25Mi"
+        cpu: "15m"
+    envSecretName: "amify-secret"
+    config:
+      hook:
+        auth:
+          enable: false
+        log:
+          level: "info"  # possible values: "debug", "info", "warn", "error"
+          format: "json" # possible values: "text", "json"
+        terminationGracePeriod: 0
+      ntfy:
+        baseUrl: "https://ntfy.murtazau.xyz"
+        auth:
+          enable: true
+        notification:
+          topic: "alertmanager"
+          priority: |
+            Status == "firing" ? "urgent" : "default"
+          tags:
+            - tag: "rotating_light,construction"
+              condition: |
+                Status == "firing"
+            - tag: "white_check_mark,confetti_ball"
+              condition: |
+                Status == "resolved"
+          title: |
+              {{ if eq .Status "resolved" }}Resolved: {{ end }}{{ index .Annotations "summary" }}
+          description: |
+              {{ index .Annotations "description" }}
