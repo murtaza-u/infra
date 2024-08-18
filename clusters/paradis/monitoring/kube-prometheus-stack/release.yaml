@@ -46,7 +46,7 @@ spec:
           - name: 'ntfy'
             webhook_configs:
               send_resolved: true
-              url: http://amify-svc.monitoring.svc.cluster.local/hook
+              url: http://monitoring-amify-svc.monitoring.svc.cluster.local/hook
       alertmanagerSpec:
         replicas: 1
         retention: 72h
