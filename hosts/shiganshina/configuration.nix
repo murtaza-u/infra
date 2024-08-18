@@ -68,6 +68,9 @@
     };
   };
 
+  # Sync system clock.
+  services.timesyncd.enable = true;
+
   # K3S.
   services.k3s = {
     enable = true;
