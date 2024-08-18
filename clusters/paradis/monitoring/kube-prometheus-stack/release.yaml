@@ -41,12 +41,13 @@ spec:
               matchers:
                 - alertname = "Watchdog"
             - receiver: 'ntfy'
+              continue: true
         receivers:
           - name: 'null'
           - name: 'ntfy'
             webhook_configs:
-              send_resolved: true
-              url: http://monitoring-amify-svc.monitoring.svc.cluster.local/hook
+              - send_resolved: true
+                url: http://monitoring-amify-svc.monitoring.svc.cluster.local/hook
       alertmanagerSpec:
         replicas: 1
         retention: 72h
