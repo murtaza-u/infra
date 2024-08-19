@@ -30,6 +30,7 @@
           yamllint
           kubeconform
           kubeseal
+          kubelogin-oidc
         ];
       };
     };
