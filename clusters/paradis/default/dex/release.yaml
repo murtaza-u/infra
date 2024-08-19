@@ -1,0 +1,53 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: dex
+  namespace: default
+spec:
+  chart:
+    spec:
+      chart: dex
+      interval: 10m0s
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: dex
+      version: 0.19.x
+  interval: 10m0s
+  targetNamespace: default
+  values:
+    replicaCount: 1
+    configSecret:
+      create: false
+      name: "dex-config"
+    podSecurityContext: # pod
+      seccompProfile:
+        type: RuntimeDefault
+      runAsUser: 1001
+      runAsGroup: 1001
+      runAsNonRoot: true
+    securityContext: # container
+      allowPrivilegeEscalation: false
+      privileged: false
+    ingress:
+      enabled: true
+      className: "traefik"
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+      hosts:
+        - host: dex.murtazau.xyz
+          paths:
+            - path: /
+              pathType: ImplementationSpecific
+      tls:
+        - secretName: dex-cert
+          hosts:
+            - dex.murtazau.xyz
+    resources:
+      limits:
+        cpu: 300m
+        memory: 55Mi
+      requests:
+        cpu: 100m
+        memory: 30Mi
