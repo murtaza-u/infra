@@ -5,3 +5,4 @@ resources:
   - dex-config-sealed.yaml
   - repository.yaml
   - release.yaml
+  - clusterolebinding.yaml
