@@ -74,7 +74,13 @@
   # K3S.
   services.k3s = {
     enable = true;
-    extraFlags = "--tls-san k3s.murtazau.xyz --secrets-encryption";
+    extraFlags = ''
+      --tls-san k3s.murtazau.xyz \
+      --secrets-encryption \
+      --kube-apiserver-arg=oidc-issuer-url=https://dex.murtazau.xyz/dex \
+      --kube-apiserver-arg=oidc-client-id=kubernetes \
+      --kube-apiserver-arg=oidc-username-claim=sub
+    '';
     serverAddr = "https://k3s.murtazau.xyz:6443";
   };
 
