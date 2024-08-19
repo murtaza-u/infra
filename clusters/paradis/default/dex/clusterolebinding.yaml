@@ -1,3 +1,4 @@
+---
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
@@ -7,5 +8,5 @@ roleRef:
   kind: ClusterRole
   name: cluster-admin
 subjects:
-- kind: User
-  name: https://dex.murtazau.xyz/dex#Cgg3NTMwNDgxMhIGZ2l0aHVi
+  - kind: User
+    name: https://dex.murtazau.xyz/dex#Cgg3NTMwNDgxMhIGZ2l0aHVi
