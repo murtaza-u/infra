@@ -136,7 +136,7 @@ spec:
           requests:
             cpu: 70m
             memory: 500Mi
-        retention: 2d
+        retention: 7h
         retentionSize: ""
         scrapeInterval: ""
         scrapeTimeout: ""
