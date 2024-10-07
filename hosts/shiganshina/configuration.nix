@@ -69,7 +69,10 @@
   };
 
   # Sync system clock.
-  services.timesyncd.enable = true;
+  services.chrony = {
+    enable = true;
+    enableNTS = true;
+  };
 
   # K3S.
   services.k3s = {
