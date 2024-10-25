@@ -277,8 +277,8 @@ config:
 
 bedrockServer:
   image:
-    tag: "2024.10.0"
-    pullPolicy: "IfNotPresent"
+    tag: "latest"
+    pullPolicy: "Always"
   resources:
     limits:
       memory: "1Gi"
