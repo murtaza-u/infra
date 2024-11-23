@@ -77,6 +77,7 @@
   # K3S.
   services.k3s = {
     enable = true;
+    package = pkgs.k3s_1_31;
     extraFlags = ''
       --tls-san k3s.murtazau.xyz \
       --secrets-encryption \
@@ -95,7 +96,5 @@
     443 # traefik https
     6443 # kubernetes apiserver
   ];
-  networking.firewall.allowedUDPPorts = [
-    19132 # minecraft bedrock server
-  ];
+  networking.firewall.allowedUDPPorts = [ ];
 }
