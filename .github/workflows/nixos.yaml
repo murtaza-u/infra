@@ -12,11 +12,11 @@ on:
       - "hosts/**"
 
 jobs:
-  deploy:
+  shiganshina:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up SSH agent
         uses: webfactory/ssh-agent@v0.9.0
@@ -36,12 +36,47 @@ jobs:
         run: 'export SSH_CONFIG_FILE=~/.ssh/config'
 
       - name: Install nix
-        uses: cachix/install-nix-action@v27
+        uses: cachix/install-nix-action@v30
 
       - name: Rebuild the new configuration and push it to remote
         run: |
           nix develop --impure --command nixos-rebuild \
             --flake .#shiganshina \
             --target-host shiganshina \
+            --use-remote-sudo \
+            switch
+  base:
+    runs-on:
+      - nixos
+      - node-base
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up SSH agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: "${{ secrets.SSH_PRIVATE_KEY }}"
+
+      - name: Create SSH config directory
+        run: 'mkdir -p /home/$USER/.ssh'
+
+      - name: Write custom SSH config from secret
+        run: 'echo "${{ secrets.SSH_CONFIG_FILE }}" > /home/$USER/.ssh/config'
+
+      - name: Configure known hosts
+        run: 'echo "${{ secrets.SSH_KNOWN_HOST }}" > /home/$USER/.ssh/known_hosts'
+
+      - name: Set SSH_CONFIG_FILE environment variable
+        run: 'export SSH_CONFIG_FILE=/home/$USER/.ssh/config'
+
+      - name: Install nix
+        uses: cachix/install-nix-action@v30
+
+      - name: Rebuild the new configuration and push it to remote
+        run: |
+          nix develop --impure --command nixos-rebuild \
+            --flake .#base \
+            --target-host base \
             --use-remote-sudo \
             switch

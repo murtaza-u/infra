@@ -1,28 +1,41 @@
 {
-  description = "My homelab on AWS";
-  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
-  outputs = { nixpkgs, ... }@inputs:
+  description = "My homelab configuration";
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
+  outputs = { nixpkgs, sops-nix, ... }:
     let
       system = "x86_64-linux";
-      lib = nixpkgs.lib;
-      pkgs = import nixpkgs {
-        inherit system;
-        config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
-          "vault-bin"
-        ];
-      };
+      pkgs = import nixpkgs { inherit system; };
     in
     {
       formatter.${system} = pkgs.nixpkgs-fmt;
-      nixosConfigurations.shiganshina = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        modules = [
-          {
-            nix.registry.nixpkgs.flake = nixpkgs;
-            system.stateVersion = "24.05";
-          }
-          ./hosts/shiganshina
-        ];
+      nixosConfigurations = {
+        shiganshina = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            {
+              nix.registry.nixpkgs.flake = nixpkgs;
+              system.stateVersion = "24.11";
+            }
+            ./hosts/shiganshina
+          ];
+        };
+        base = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            {
+              nix.registry.nixpkgs.flake = nixpkgs;
+              system.stateVersion = "24.11";
+            }
+            ./hosts/base
+            sops-nix.nixosModules.sops
+          ];
+        };
       };
       devShells.${system}.default = pkgs.mkShell {
         packages = with pkgs; [
@@ -37,7 +50,8 @@
           kubeconform
           kubeseal
           kubelogin-oidc
-          vault-bin
+          sops
+          ssh-to-age
         ];
       };
     };
