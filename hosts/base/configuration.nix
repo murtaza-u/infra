@@ -40,6 +40,9 @@
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHlvxYvoXreZ+iNU5ia0QkjYIIVwAUD9z7b/P1eoF0P+"
       ];
     };
+    ghrunner = {
+      isNormalUser = true;
+    };
   };
 
   # Enable password-less sudo for `scout`.

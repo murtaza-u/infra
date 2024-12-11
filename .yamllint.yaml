@@ -3,6 +3,7 @@ extends: default
 ignore:
   - clusters/paradis/flux-system/
   - charts/**/templates/
+  - secrets.yaml
 rules:
   line-length:
     ignore: "*"

@@ -1,7 +1,13 @@
 {
   description = "My homelab configuration";
-  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
-  outputs = { nixpkgs, ... }:
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
+  outputs = { nixpkgs, sops-nix, ... }:
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
@@ -27,6 +33,7 @@
               system.stateVersion = "24.11";
             }
             ./hosts/base
+            sops-nix.nixosModules.sops
           ];
         };
       };
@@ -43,6 +50,8 @@
           kubeconform
           kubeseal
           kubelogin-oidc
+          sops
+          ssh-to-age
         ];
       };
     };
