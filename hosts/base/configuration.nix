@@ -17,17 +17,6 @@
   # Define on which hard drive you want to install Grub.
   boot.loader.grub.device = "/dev/sda"; # or "nodev" for efi only
 
-  networking = {
-    hostName = "base"; # Define your hostname.
-    # Assigning static ip address to host.
-    interfaces.enp9s0 = {
-      ipv4.addresses = [{
-        address = "192.168.29.5";
-        prefixLength = 24;
-      }];
-    };
-  };
-
   # Set your time zone.
   time.timeZone = "Asia/Kolkata";
 
@@ -90,10 +79,15 @@
   systemd.targets.sleep.enable = false;
   services.logind.lidSwitch = "ignore";
 
-  # Open ports in the firewall.
-  networking.firewall.enable = true;
-  networking.firewall.allowedTCPPorts = [
-    22 # ssh
-  ];
-  networking.firewall.allowedUDPPorts = [ ];
+  networking = {
+    hostName = "base"; # Define your hostname.
+    # Open ports in the firewall.
+    firewall = {
+      enable = true;
+      allowedTCPPorts = [
+        22 # ssh
+      ];
+      allowedUDPPorts = [ ];
+    };
+  };
 }
