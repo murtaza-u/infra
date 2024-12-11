@@ -12,11 +12,11 @@ on:
       - "hosts/**"
 
 jobs:
-  deploy:
+  shiganshina:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up SSH agent
         uses: webfactory/ssh-agent@v0.9.0
@@ -36,7 +36,7 @@ jobs:
         run: 'export SSH_CONFIG_FILE=~/.ssh/config'
 
       - name: Install nix
-        uses: cachix/install-nix-action@v27
+        uses: cachix/install-nix-action@v30
 
       - name: Rebuild the new configuration and push it to remote
         run: |
@@ -45,3 +45,13 @@ jobs:
             --target-host shiganshina \
             --use-remote-sudo \
             switch
+  base:
+    runs-on:
+      - nixos
+      - node-base
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Rebuild and apply the new configuration
+        run: "sudo nixos-rebuild --flake .#base switch"
