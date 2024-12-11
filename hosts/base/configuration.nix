@@ -1,10 +1,6 @@
-{ pkgs, lib, modulesPath, ... }:
+{ lib, pkgs, ... }:
 
 {
-  imports = [
-    "${modulesPath}/virtualisation/amazon-image.nix"
-  ];
-
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
     auto-optimise-store = true;
@@ -16,15 +12,19 @@
     options = "--delete-older-than 10d";
   };
 
-  networking.hostName = "shiganshina";
+  # Use the GRUB 2 boot loader.
+  boot.loader.grub.enable = true;
+  # Define on which hard drive you want to install Grub.
+  boot.loader.grub.device = "/dev/sda"; # or "nodev" for efi only
 
   # Set your time zone.
   time.timeZone = "Asia/Kolkata";
 
-  # We have two users on the system.
+  # We have three users on the system.
   #
   # `murtaza`: normal user
   # `scout`: continuous deployment
+  # `ghrunner`: github action runner
   users.users = {
     murtaza = {
       isNormalUser = true;
@@ -39,6 +39,9 @@
       openssh.authorizedKeys.keys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHlvxYvoXreZ+iNU5ia0QkjYIIVwAUD9z7b/P1eoF0P+"
       ];
+    };
+    ghrunner = {
+      isNormalUser = true;
     };
   };
 
@@ -73,27 +76,21 @@
     enableNTS = true;
   };
 
-  # K3S.
-  services.k3s = {
-    enable = true;
-    package = pkgs.k3s_1_31;
-    extraFlags = ''
-      --tls-san k3s.murtazau.xyz \
-      --secrets-encryption \
-      --kube-apiserver-arg=oidc-issuer-url=https://dex.murtazau.xyz/dex \
-      --kube-apiserver-arg=oidc-client-id=kubernetes \
-      --kube-apiserver-arg=oidc-username-claim=sub
-    '';
-    serverAddr = "https://k3s.murtazau.xyz:6443";
-  };
+  # Disable suspend.
+  # We are using a laptop as a server here, so we want it to keep running even
+  # when the lid is closed.
+  systemd.targets.sleep.enable = false;
+  services.logind.lidSwitch = "ignore";
 
-  # Open ports in the firewall.
-  networking.firewall.enable = true;
-  networking.firewall.allowedTCPPorts = [
-    22 # ssh
-    80 # traefik http
-    443 # traefik https
-    6443 # kubernetes apiserver
-  ];
-  networking.firewall.allowedUDPPorts = [ ];
+  networking = {
+    hostName = "base"; # Define your hostname.
+    # Open ports in the firewall.
+    firewall = {
+      enable = true;
+      allowedTCPPorts = [
+        22 # ssh
+      ];
+      allowedUDPPorts = [ ];
+    };
+  };
 }
