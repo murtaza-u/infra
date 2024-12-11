@@ -1,10 +1,6 @@
-{ pkgs, lib, modulesPath, ... }:
+{ lib, pkgs, ... }:
 
 {
-  imports = [
-    "${modulesPath}/virtualisation/amazon-image.nix"
-  ];
-
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
     auto-optimise-store = true;
@@ -16,7 +12,21 @@
     options = "--delete-older-than 10d";
   };
 
-  networking.hostName = "shiganshina";
+  # Use the GRUB 2 boot loader.
+  boot.loader.grub.enable = true;
+  # Define on which hard drive you want to install Grub.
+  boot.loader.grub.device = "/dev/sda"; # or "nodev" for efi only
+
+  networking = {
+    hostName = "base"; # Define your hostname.
+    # Assigning static ip address to host.
+    interfaces.enp9s0 = {
+      ipv4.addresses = [{
+        address = "192.168.29.5";
+        prefixLength = 24;
+      }];
+    };
+  };
 
   # Set your time zone.
   time.timeZone = "Asia/Kolkata";
@@ -74,27 +84,16 @@
     enableNTS = true;
   };
 
-  # K3S.
-  services.k3s = {
-    enable = true;
-    package = pkgs.k3s_1_31;
-    extraFlags = ''
-      --tls-san k3s.murtazau.xyz \
-      --secrets-encryption \
-      --kube-apiserver-arg=oidc-issuer-url=https://dex.murtazau.xyz/dex \
-      --kube-apiserver-arg=oidc-client-id=kubernetes \
-      --kube-apiserver-arg=oidc-username-claim=sub
-    '';
-    serverAddr = "https://k3s.murtazau.xyz:6443";
-  };
+  # Disable suspend.
+  # We are using a laptop as a server here, so we want it to keep running even
+  # when the lid is closed.
+  systemd.targets.sleep.enable = false;
+  services.logind.lidSwitch = "ignore";
 
   # Open ports in the firewall.
   networking.firewall.enable = true;
   networking.firewall.allowedTCPPorts = [
     22 # ssh
-    80 # traefik http
-    443 # traefik https
-    6443 # kubernetes apiserver
   ];
   networking.firewall.allowedUDPPorts = [ ];
 }
