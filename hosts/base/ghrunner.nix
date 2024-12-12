@@ -13,9 +13,10 @@
   };
 
   services.github-runners.infra = {
+    name = "node-base-infra";
     enable = true;
     ephemeral = true;
-    name = "node-base-infra";
+    replace = true;
     user = config.users.users.ghrunner.name;
     url = "https://github.com/murtaza-u/infra";
     tokenFile = config.sops.secrets."gh_pat".path;
