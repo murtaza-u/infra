@@ -13,6 +13,30 @@
     in
     {
       formatter.${system} = pkgs.nixpkgs-fmt;
+      nixosConfigurations = {
+        srv-cloud-0 = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            {
+              nix.registry.nixpkgs.flake = nixpkgs;
+              system.stateVersion = "24.11";
+            }
+            ./modules
+            ./hosts/srv-cloud-0
+          ];
+        };
+        srv-onprem-0 = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            {
+              nix.registry.nixpkgs.flake = nixpkgs;
+              system.stateVersion = "24.11";
+            }
+            ./modules
+            ./hosts/srv-onprem-0
+          ];
+        };
+      };
       devShells.${system}.default = pkgs.mkShell {
         packages = with pkgs; [
           nixd
