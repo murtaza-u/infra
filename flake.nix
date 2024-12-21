@@ -1,7 +1,13 @@
 {
   description = "Lab on a Shoestring";
-  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
-  outputs = { nixpkgs, ... }:
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
+  outputs = { nixpkgs, sops-nix, ... }:
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs {
@@ -21,8 +27,9 @@
               nix.registry.nixpkgs.flake = nixpkgs;
               system.stateVersion = "24.11";
             }
-            ./modules
             ./hosts/srv-cloud-0
+            ./modules
+            sops-nix.nixosModules.sops
           ];
         };
         srv-onprem-0 = nixpkgs.lib.nixosSystem {
@@ -32,8 +39,9 @@
               nix.registry.nixpkgs.flake = nixpkgs;
               system.stateVersion = "24.11";
             }
-            ./modules
             ./hosts/srv-onprem-0
+            ./modules
+            sops-nix.nixosModules.sops
           ];
         };
       };
@@ -48,6 +56,8 @@
           cbfmt
           mdformat
           shfmt
+          sops
+          ssh-to-age
         ];
       };
     };

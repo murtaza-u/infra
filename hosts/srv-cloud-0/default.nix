@@ -1,15 +1,37 @@
-{ modulesPath, ... }:
+{ modulesPath, config, ... }:
 
 {
   imports = [
     "${modulesPath}/virtualisation/amazon-image.nix"
   ];
 
-  # Set hostname.
-  networking.hostName = "srv-cloud-0";
-
   # Set your time zone.
   time.timeZone = "Etc/UTC";
+
+  networking = {
+    # Set hostname.
+    hostName = "srv-cloud-0";
+    # Open ports in the firewall.
+    firewall = {
+      enable = true;
+      allowedTCPPorts = [
+        22 # ssh
+        80 # traefik http
+        443 # traefik https
+      ];
+      allowedUDPPorts = [ ];
+    };
+  };
+
+  sops = {
+    defaultSopsFile = ../../secrets.yaml;
+    validateSopsFiles = false;
+    age.sshKeyPaths = [ "/home/${config.users.users.scout.name}/.ssh/id_ed25519" ];
+    secrets."tailscale/auth_keys/srv_cloud_0" = {
+      mode = "0400";
+      owner = "root";
+    };
+  };
 
   platform = {
     # enable flakes & configure gc
@@ -20,16 +42,10 @@
     ssh.enable = true;
     # enable timesyncd service
     synctime.enable = true;
-  };
-
-  # Open ports in the firewall.
-  networking.firewall = {
-    enable = true;
-    allowedTCPPorts = [
-      22 # ssh
-      80 # traefik http
-      443 # traefik https
-    ];
-    allowedUDPPorts = [ ];
+    # tailscale
+    tailscale = {
+      enable = true;
+      authKeyFile = config.sops.secrets."tailscale/auth_keys/srv_cloud_0".path;
+    };
   };
 }

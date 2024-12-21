@@ -4,5 +4,6 @@
     ./ssh.nix
     ./users.nix
     ./synctime.nix
+    ./tailscale.nix
   ];
 }
