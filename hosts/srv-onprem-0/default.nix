@@ -38,9 +38,15 @@
     defaultSopsFile = ../../secrets.yaml;
     validateSopsFiles = false;
     age.sshKeyPaths = [ "/home/${config.users.users.scout.name}/.ssh/id_ed25519" ];
-    secrets."tailscale/auth_keys/srv_onprem_0" = {
-      mode = "0400";
-      owner = "root";
+    secrets = {
+      "tailscale/auth_keys/srv_onprem_0" = {
+        mode = "0400";
+        owner = "root";
+      };
+      "k3s_token" = {
+        mode = "0400";
+        owner = "root";
+      };
     };
   };
 
@@ -58,5 +64,20 @@
       enable = true;
       authKeyFile = config.sops.secrets."tailscale/auth_keys/srv_onprem_0".path;
     };
+  };
+
+  # K3S.
+  services.k3s = {
+    enable = true;
+    serverAddr = "https://srv-cloud-0:6443";
+    gracefulNodeShutdown = {
+      enable = true;
+      shutdownGracePeriod = "1m30s";
+    };
+    role = "agent";
+    tokenFile = config.sops.secrets."k3s_token".path;
+    extraFlags = ''
+      --node-ip 100.97.243.45
+    '';
   };
 }

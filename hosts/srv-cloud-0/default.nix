@@ -48,4 +48,20 @@
       authKeyFile = config.sops.secrets."tailscale/auth_keys/srv_cloud_0".path;
     };
   };
+
+  # K3S.
+  services.k3s = {
+    enable = true;
+    serverAddr = "https://srv-cloud-0:6443";
+    gracefulNodeShutdown = {
+      enable = true;
+      shutdownGracePeriod = "1m30s";
+    };
+    role = "server";
+    extraFlags = ''
+      --tls-san srv-cloud-0 \
+      --secrets-encryption \
+      --node-ip 100.68.57.80
+    '';
+  };
 }

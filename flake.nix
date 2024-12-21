@@ -58,6 +58,7 @@
           shfmt
           sops
           ssh-to-age
+          kubectl
         ];
       };
     };
