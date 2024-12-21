@@ -59,6 +59,7 @@
           sops
           ssh-to-age
           kubectl
+          fluxcd
         ];
       };
     };
