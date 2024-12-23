@@ -23,6 +23,7 @@ spec:
     crds: CreateReplace
   values:
     loki:
+      auth_enabled: false
       # The number of old ReplicaSets to retain to allow rollback
       revisionHistoryLimit: 3
       limits_config:
