@@ -52,8 +52,14 @@ spec:
             - receiver: 'null'
               matchers:
                 - alertname = "Watchdog"
+            - receiver: 'ntfy'
+              continue: true
         receivers:
           - name: 'null'
+          - name: 'ntfy'
+            webhook_configs:
+              - send_resolved: true
+                url: http://alertfy-svc.monitoring.svc.cluster.local/hook
       alertmanagerSpec:
         # Size is the expected size of the alertmanager cluster. The controller
         # will eventually make the size of the running cluster equal to the
