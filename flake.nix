@@ -42,6 +42,7 @@
           yamlfmt
           yamllint
           kubectl
+          fluxcd
         ];
       };
     };

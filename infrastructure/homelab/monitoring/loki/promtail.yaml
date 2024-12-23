@@ -1,0 +1,66 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: promtail
+  namespace: monitoring
+spec:
+  chart:
+    spec:
+      chart: promtail
+      interval: 10m0s
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: grafana
+      version: 6.x.x
+  dependsOn:
+    - name: loki
+      namespace: monitoring
+  install:
+    crds: Create
+  interval: 10m0s
+  upgrade:
+    crds: CreateReplace
+  values:
+    daemonset:
+      # Deploys Promtail as a DaemonSet
+      enabled: false
+    deployment:
+      # Deploys Promtail as a Deployment
+      enabled: true
+      replicaCount: 1
+    # Resource requests and limits
+    resources:
+      requests:
+        cpu: 80m
+        memory: 100Mi
+      limits:
+        cpu: 100m
+        memory: 150Mi
+    # Tolerations for pods. By default, pods will be scheduled on
+    # master/control-plane nodes.
+    tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
+    # ServiceMonitor configuration
+    serviceMonitor:
+      # If enabled, ServiceMonitor resources for Prometheus Operator are
+      # created
+      enabled: true
+    # Section for crafting Promtails config file. The only directly relevant
+    # value is `config.file` which is a templated string that references the
+    # other values and snippets below this key.
+    config:
+      # Enable Promtail config from Helm chart
+      # Set `configmap.enabled: true` and this to `false` to manage your own
+      # Promtail config
+      enabled: true
+      # The config of clients of the Promtail server
+      # Must be reference in `config.file` to configure `clients`
+      clients:
+        - url: "http://monitoring-loki-gateway.monitoring.svc.cluster.local/loki/api/v1/push"
