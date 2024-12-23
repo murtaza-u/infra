@@ -1,0 +1,46 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: sealed-secrets
+  namespace: sealed-secrets
+spec:
+  chart:
+    spec:
+      chart: sealed-secrets
+      interval: 10m0s
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: sealed-secrets
+      version: 2.x.x
+  install:
+    crds: Create
+  interval: 10m0s
+  upgrade:
+    crds: CreateReplace
+  values:
+    # Specifies key renewal period. e.g "720h30m"
+    #
+    # Default 30 days
+    #
+    # To disable use "0", with quotes!
+    keyrenewperiod: ""
+    resources:
+      requests:
+        cpu: 50m
+        memory: 25Mi
+      limits:
+        cpu: 100m
+        memory: 50Mi
+    metrics:
+      dashboards:
+        create: true
+        labels:
+          grafana_dashboard: "1"
+        namespace: monitoring
+      serviceMonitor:
+        enabled: true
+        labels:
+          release: kube-prometheus-stack
+        namespace: monitoring

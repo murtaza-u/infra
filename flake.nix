@@ -43,6 +43,9 @@
           yamllint
           kubectl
           fluxcd
+          kubernetes-helm
+          kustomize
+          kubeseal
         ];
       };
     };
