@@ -137,8 +137,21 @@ spec:
           cpu: 100m
           memory: 200Mi
     lokiCanary:
-      # Disabled due to lack of sufficient resources
-      enabled: false
+      enabled: true
+      # If true, the canary will send directly to Loki via the address
+      # configured for verification.
+      #
+      # If false, it will write to stdout and an Agent will be needed to scrape
+      # and send the logs.
+      push: true
+      # Resource requests and limits for the canary
+      resources:
+        requests:
+          cpu: 20m
+          memory: 30Mi
+        limits:
+          cpu: 20m
+          memory: 50Mi
     # Zero out replica counts of other deployment modes
     backend:
       replicas: 0
