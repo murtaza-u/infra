@@ -119,10 +119,10 @@ spec:
       resources:
         requests:
           cpu: 5m
-          memory: 12Mi
+          memory: 25Mi
         limits:
           cpu: 5m
-          memory: 20Mi
+          memory: 50Mi
     # This startupapicheck is a Helm post-install hook that waits for the
     # webhook endpoints to become available.
     # The check is implemented using a Kubernetes Job - if you are injecting
