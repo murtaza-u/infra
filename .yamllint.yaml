@@ -1,0 +1,10 @@
+---
+extends: default
+ignore:
+  - clusters/homelab/flux-system/
+  - secrets.yaml
+rules:
+  line-length:
+    ignore: "*"
+  comments:
+    min-spaces-from-content: 1
