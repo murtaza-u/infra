@@ -133,10 +133,10 @@ spec:
       resources:
         requests:
           cpu: 50m
-          memory: 100Mi
+          memory: 200Mi
         limits:
           cpu: 100m
-          memory: 200Mi
+          memory: 300Mi
     lokiCanary:
       enabled: true
       # If true, the canary will send directly to Loki via the address
