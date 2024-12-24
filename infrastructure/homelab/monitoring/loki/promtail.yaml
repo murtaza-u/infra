@@ -52,6 +52,9 @@ spec:
       # If enabled, ServiceMonitor resources for Prometheus Operator are
       # created
       enabled: true
+      # Additional ServiceMonitor labels
+      labels:
+        release: monitoring-kube-prometheus-stack
     # Section for crafting Promtails config file. The only directly relevant
     # value is `config.file` which is a templated string that references the
     # other values and snippets below this key.

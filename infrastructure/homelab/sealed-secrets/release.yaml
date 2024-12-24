@@ -42,5 +42,5 @@ spec:
       serviceMonitor:
         enabled: true
         labels:
-          release: kube-prometheus-stack
-        namespace: monitoring
+          release: monitoring-kube-prometheus-stack
+        namespace: sealed-secrets

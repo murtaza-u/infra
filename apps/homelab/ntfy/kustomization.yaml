@@ -5,6 +5,7 @@ resources:
   - ../../base/ntfy
   - namespace.yaml
   - ingress.yaml
+  - servicemonitor.yaml
 configMapGenerator:
   - name: ntfy
     files:
@@ -26,3 +27,21 @@ patches:
           limits:
             cpu: 10m
             memory: 50Mi
+      - op: add
+        path: /spec/template/spec/containers/0/ports/1
+        value:
+          containerPort: 9090
+          name: metrics
+  - target:
+      group: ""
+      version: v1
+      kind: Service
+      name: ntfy
+    patch: |-
+      - op: add
+        path: /spec/ports/1
+        value:
+          name: metrics
+          protocol: TCP
+          port: 9090
+          targetPort: metrics

@@ -70,16 +70,9 @@ spec:
         targetPort: 9402
         # The path to scrape for metrics.
         path: /metrics
-        # The interval to scrape metrics.
-        interval: 60s
-        # The timeout before a metrics scrape fails.
-        scrapeTimeout: 30s
         # Additional labels to add to the ServiceMonitor.
-        labels: {}
-        # Additional annotations to add to the ServiceMonitor.
-        annotations: {}
-        # Keep labels from scraped data, overriding server-side labels.
-        honorLabels: false
+        labels:
+          release: monitoring-kube-prometheus-stack
     webhook:
       # Number of replicas of the cert-manager webhook to run.
       #
