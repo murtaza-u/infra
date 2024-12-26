@@ -64,7 +64,8 @@
       --node-ip 100.122.27.100 \
       --kube-controller-manager-arg bind-address=0.0.0.0 \
       --kube-scheduler-arg bind-address=0.0.0.0 \
-      --kube-proxy-arg metrics-bind-address=0.0.0.0
+      --kube-proxy-arg metrics-bind-address=0.0.0.0 \
+      --flannel-iface tailscale0
     '';
   };
 }

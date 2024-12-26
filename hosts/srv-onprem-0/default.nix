@@ -17,15 +17,21 @@
   services.logind.lidSwitch = "ignore";
 
   networking = {
+    enableIPv6 = false;
     # Set hostname.
     hostName = "srv-onprem-0";
+    nameservers = [
+      "94.247.43.254"
+      "37.252.191.197"
+      "152.53.15.127"
+    ];
     # Open ports in the firewall.
     firewall = {
       enable = true;
       allowedTCPPorts = [
         22 # ssh
-        80 # traefik http
-        443 # traefik https
+        80 # nginx http
+        443 # nginx https
       ];
       allowedUDPPorts = [ ];
     };
@@ -78,7 +84,8 @@
     tokenFile = config.sops.secrets."k3s_token".path;
     extraFlags = ''
       --node-ip 100.97.243.45 \
-      --kube-proxy-arg metrics-bind-address=0.0.0.0
+      --kube-proxy-arg metrics-bind-address=0.0.0.0 \
+      --flannel-iface tailscale0
     '';
   };
 }
