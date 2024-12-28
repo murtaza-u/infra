@@ -53,6 +53,34 @@
         mode = "0400";
         owner = "root";
       };
+      "transmission/rpc_user" = {
+        mode = "0400";
+        owner = "transmission";
+        group = "transmission";
+      };
+      "transmission/rpc_password" = {
+        mode = "0400";
+        owner = "transmission";
+        group = "transmission";
+      };
+      "cf_token" = {
+        mode = "0400";
+        owner = config.services.nginx.user;
+        group = config.services.nginx.group;
+      };
+    };
+    templates = {
+      "transmission/settings.json" = {
+        content = ''
+          {
+            "rpc-username": "${config.sops.placeholder."transmission/rpc_user"}",
+            "rpc-password": "${config.sops.placeholder."transmission/rpc_password"}"
+          }
+        '';
+        mode = "0400";
+        owner = "transmission";
+        group = "transmission";
+      };
     };
   };
 
@@ -87,5 +115,40 @@
       --kube-proxy-arg metrics-bind-address=0.0.0.0 \
       --flannel-iface tailscale0
     '';
+  };
+
+  media = {
+    transmission = {
+      enable = true;
+      credentialsFile = config.sops.templates."transmission/settings.json".path;
+    };
+    arr.enable = true;
+    jellyseerr.enable = true;
+    jellyfin.enable = true;
+    reverseProxies = {
+      enable = true;
+      domain = "home.murtazau.xyz";
+      enableTLS = true;
+      useACMEHost = "home.murtazau.xyz";
+    };
+  };
+
+  security.acme = {
+    acceptTerms = true;
+    defaults = {
+      # server = "https://acme-staging-v02.api.letsencrypt.org/directory";
+      server = "https://acme-v02.api.letsencrypt.org/directory";
+      email = "murtaza@murtazau.xyz";
+      dnsResolver = "1.1.1.1:53";
+      dnsProvider = "cloudflare";
+      credentialFiles = {
+        "CF_DNS_API_TOKEN_FILE" = config.sops.secrets."cf_token".path;
+      };
+    };
+    certs."home.murtazau.xyz" = {
+      group = config.services.nginx.group;
+      inheritDefaults = true;
+      domain = "*.home.murtazau.xyz";
+    };
   };
 }

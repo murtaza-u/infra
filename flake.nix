@@ -12,16 +12,23 @@
       system = "x86_64-linux";
       pkgs = import nixpkgs {
         inherit system;
-        config.allowUnfreePredicate = pkg: builtins.elem (pkgs.lib.getName pkg) [
-          "terraform"
-        ];
+        config = {
+          allowUnfreePredicate = pkg: builtins.elem (pkgs.lib.getName pkg) [
+            "terraform"
+          ];
+          permittedInsecurePackages = [
+            "dotnet-sdk-6.0.428"
+            "aspnetcore-runtime-6.0.36"
+          ];
+        };
       };
     in
     {
       formatter.${system} = pkgs.nixpkgs-fmt;
       nixosConfigurations = {
-        srv-cloud-0 = nixpkgs.lib.nixosSystem {
+        srv-cloud-0 = pkgs.lib.nixosSystem {
           system = "aarch64-linux";
+          pkgs = pkgs;
           modules = [
             {
               nix.registry.nixpkgs.flake = nixpkgs;
@@ -34,6 +41,7 @@
         };
         srv-onprem-0 = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
+          pkgs = pkgs;
           modules = [
             {
               nix.registry.nixpkgs.flake = nixpkgs;
