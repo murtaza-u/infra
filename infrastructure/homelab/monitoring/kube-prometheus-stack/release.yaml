@@ -33,6 +33,44 @@ spec:
       rules:
         etcd: false
         windows: false
+      # Disabled PrometheusRule alerts
+      disabled:
+        KubeNodeNotReady: true
+        KubeNodeUnreachable: true
+        TargetDown: true
+    # Provide custom recording or alerting rules to be deployed into the cluster.
+    additionalPrometheusRulesMap:
+      custom.rules:
+        groups:
+          - name: custom.rules
+            rules:
+              - alert: TargetDown_Custom
+                annotations:
+                  description: '{{ printf "%.4g" $value }}% of the {{ $labels.job }}/{{ $labels.service }} targets in {{ $labels.namespace }} namespace are down.'
+                  runbook_url: https://runbooks.prometheus-operator.dev/runbooks/general/targetdown
+                  summary: One or more targets are unreachable.
+                expr: 100 * (count(up == 0) BY (cluster, job, namespace, service) / count(up) BY (cluster, job, namespace, service)) > 50
+                for: 10m
+                labels:
+                  severity: warning
+              - alert: KubeNodeNotReady_Custom
+                annotations:
+                  description: '{{ $labels.node }} has been unready for more than 15 minutes.'
+                  runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubenodenotready
+                  summary: Node is not ready.
+                expr: kube_node_status_condition{job="kube-state-metrics",condition="Ready",status="true",node!="srv-onprem-0"} == 0
+                for: 15m
+                labels:
+                  severity: warning
+              - alert: KubeNodeUnreachable_Custom
+                annotations:
+                  description: '{{ $labels.node }} is unreachable and some workloads may be rescheduled.'
+                  runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubenodeunreachable
+                  summary: Node is unreachable.
+                expr: (kube_node_spec_taint{job="kube-state-metrics",key="node.kubernetes.io/unreachable",effect="NoSchedule",node!="srv-onprem-0"} unless ignoring(key,value) kube_node_spec_taint{job="kube-state-metrics",key=~"ToBeDeletedByClusterAutoscaler|cloud.google.com/impending-no de-termination|aws-node-termination-handler/spot-itn"}) == 1
+                for: 15m
+                labels:
+                  severity: warning
     # Configuration for alertmanager
     alertmanager:
       enabled: true
