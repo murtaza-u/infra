@@ -85,11 +85,11 @@ spec:
       # Resources to provide to the cert-manager webhook pod.
       resources:
         requests:
-          cpu: 5m
-          memory: 12Mi
+          cpu: 25m
+          memory: 25Mi
         limits:
-          cpu: 5m
-          memory: 20Mi
+          cpu: 25m
+          memory: 50Mi
       # Enables default network policies for webhooks.
       networkPolicy:
         # Create network policies for the webhooks.
