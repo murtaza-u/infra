@@ -268,7 +268,6 @@ spec:
       # If your kube proxy is not deployed as a pod, specify IPs it can be found on
       endpoints:
         - 100.122.27.100
-        - 100.97.243.45
       service:
         enabled: true
         port: 10249
