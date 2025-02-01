@@ -26,9 +26,9 @@
     {
       formatter.${system} = pkgs.nixpkgs-fmt;
       nixosConfigurations = {
-        srv-cloud-0 = pkgs.lib.nixosSystem {
+        srv-cloud-0 = nixpkgs.lib.nixosSystem {
           system = "aarch64-linux";
-          pkgs = pkgs;
+          pkgs = import nixpkgs { system = "aarch64-linux"; };
           modules = [
             {
               nix.registry.nixpkgs.flake = nixpkgs;
@@ -41,7 +41,7 @@
         };
         srv-onprem-0 = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
-          pkgs = pkgs;
+          pkgs = import nixpkgs { system = "x86_64-linux"; };
           modules = [
             {
               nix.registry.nixpkgs.flake = nixpkgs;
