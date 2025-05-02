@@ -41,7 +41,7 @@
         };
         srv-onprem-0 = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
-          pkgs = import nixpkgs { system = "x86_64-linux"; };
+          inherit pkgs;
           modules = [
             {
               nix.registry.nixpkgs.flake = nixpkgs;

@@ -93,29 +93,28 @@
     ssh.enable = true;
     # enable timesyncd service
     synctime.enable = true;
-    # tailscale
-    tailscale = {
-      enable = true;
-      authKeyFile = config.sops.secrets."tailscale/auth_keys/srv_onprem_0".path;
-    };
+    # tailscale = {
+    #   enable = true;
+    #   authKeyFile = config.sops.secrets."tailscale/auth_keys/srv_onprem_0".path;
+    # };
   };
 
   # K3S.
-  services.k3s = {
-    enable = true;
-    serverAddr = "https://srv-cloud-0:6443";
-    gracefulNodeShutdown = {
-      enable = true;
-      shutdownGracePeriod = "1m30s";
-    };
-    role = "agent";
-    tokenFile = config.sops.secrets."k3s_token".path;
-    extraFlags = ''
-      --node-ip 100.97.243.45 \
-      --kube-proxy-arg metrics-bind-address=0.0.0.0 \
-      --flannel-iface tailscale0
-    '';
-  };
+  # services.k3s = {
+  #   enable = true;
+  #   serverAddr = "https://srv-cloud-0:6443";
+  #   gracefulNodeShutdown = {
+  #     enable = true;
+  #     shutdownGracePeriod = "1m30s";
+  #   };
+  #   role = "agent";
+  #   tokenFile = config.sops.secrets."k3s_token".path;
+  #   extraFlags = ''
+  #     --node-ip 100.97.243.45 \
+  #     --kube-proxy-arg metrics-bind-address=0.0.0.0 \
+  #     --flannel-iface tailscale0
+  #   '';
+  # };
 
   media = {
     transmission = {

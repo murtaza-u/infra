@@ -25,12 +25,6 @@
     fsType = "ext4";
   };
 
-  fileSystems."/boot" = {
-    device = "/dev/disk/by-label/BOOT";
-    fsType = "vfat";
-    options = [ "fmask=0022" "dmask=0022" ];
-  };
-
   swapDevices = [
     {
       device = "/dev/disk/by-label/SWAP";
