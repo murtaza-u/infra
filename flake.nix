@@ -37,6 +37,7 @@
               kubernetes-helm
               kustomize
               kubeseal
+              oci-cli
             ];
           };
         }
