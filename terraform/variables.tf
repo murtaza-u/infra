@@ -24,6 +24,12 @@ variable "oci_auth_private_key_file_path" {
   description = "Auth private key file path"
 }
 
+variable "oci_auth_private_key_password" {
+  type        = string
+  description = "Auth private key password"
+  sensitive   = true
+}
+
 variable "oci_parent_compartment_id" {
   type        = string
   description = "Compartment OCID of the parent compartment"
@@ -35,8 +41,8 @@ variable "oci_domain_admin_email" {
   sensitive   = true
 }
 
-variable "oci_gha_terraform_runner_api_pubkey" {
+variable "oci_instance_shape" {
   type        = string
-  description = "Public key that needs to be added"
-  sensitive   = true
+  default     = "VM.Standard.A1.Flex"
+  description = "Instance shape"
 }
