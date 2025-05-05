@@ -46,3 +46,9 @@ variable "oci_instance_shape" {
   default     = "VM.Standard.A1.Flex"
   description = "Instance shape"
 }
+
+variable "oci_instance_authorized_pub_key" {
+  type        = string
+  description = "Public key to be added as an authorized key to the instances."
+  sensitive   = true
+}

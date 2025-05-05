@@ -35,6 +35,25 @@ resource "oci_core_vcn" "movingbunkerlab" {
   is_ipv6enabled = false
 }
 
+resource "oci_core_internet_gateway" "movingbunkerlab_kubernetes_cluster" {
+  compartment_id = oci_identity_compartment.lab.id
+  vcn_id         = oci_core_vcn.movingbunkerlab.id
+  enabled        = true
+  display_name   = "KubernetesClusterIGW"
+}
+
+resource "oci_core_route_table" "movingbunkerlab_kubernetes_cluster" {
+  compartment_id = oci_identity_compartment.lab.id
+  vcn_id         = oci_core_vcn.movingbunkerlab.id
+  display_name   = "KubernetesCluster"
+  route_rules {
+    network_entity_id = oci_core_internet_gateway.movingbunkerlab_kubernetes_cluster.id
+    description       = "Connect to the internet"
+    destination       = "0.0.0.0/0"
+    destination_type  = "CIDR_BLOCK"
+  }
+}
+
 resource "oci_core_security_list" "kubernetes_cluster" {
   compartment_id = oci_identity_compartment.lab.id
   vcn_id         = oci_core_vcn.movingbunkerlab.id
@@ -81,7 +100,7 @@ resource "oci_core_subnet" "kubernetes_cluster" {
   cidr_block                 = "10.0.0.0/24"
   compartment_id             = oci_identity_compartment.lab.id
   vcn_id                     = oci_core_vcn.movingbunkerlab.id
-  route_table_id             = oci_core_vcn.movingbunkerlab.default_route_table_id
+  route_table_id             = oci_core_route_table.movingbunkerlab_kubernetes_cluster.id
   display_name               = "KubernetesCluster"
   prohibit_internet_ingress  = false
   prohibit_public_ip_on_vnic = false
@@ -98,7 +117,7 @@ data "oci_core_images" "oracle_linux" {
 }
 
 resource "oci_core_instance" "srv_oci_instances" {
-  count               = 2
+  count               = 1
   compartment_id      = oci_identity_compartment.lab.id
   availability_domain = oci_core_subnet.kubernetes_cluster.availability_domain
   shape               = var.oci_instance_shape
@@ -123,4 +142,7 @@ resource "oci_core_instance" "srv_oci_instances" {
     boot_volume_vpus_per_gb = "10"
   }
   preserve_boot_volume = false
+  metadata = {
+    ssh_authorized_keys = var.oci_instance_authorized_pub_key
+  }
 }
