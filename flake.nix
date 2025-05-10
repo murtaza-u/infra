@@ -2,6 +2,7 @@
   description = "Lab on a Shoestring";
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
+    unstable-nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     sops-nix = {
       url = "github:Mic92/sops-nix";
@@ -12,7 +13,8 @@
     flake-utils.lib.eachDefaultSystem
       (system:
         let
-          pkgs = import nixpkgs {
+          pkgs = import nixpkgs { inherit system; };
+          unstable = import inputs.unstable-nixpkgs {
             inherit system;
             config.allowUnfreePredicate = p: builtins.elem (pkgs.lib.getName p) [
               "terraform"
@@ -22,11 +24,9 @@
         {
           formatter = pkgs.nixpkgs-fmt;
           devShells.default = pkgs.mkShell {
-            packages = with pkgs; [
+            packages = with unstable; [
               nixd
               nixpkgs-fmt
-              terraform
-              terraform-ls
               tflint
               sops
               ssh-to-age
@@ -38,6 +38,12 @@
               kustomize
               kubeseal
               oci-cli
+              terraform-ls
+              (terraform.withPlugins (p: with p; [
+                p.null
+                external
+                oci
+              ]))
             ];
           };
         }
