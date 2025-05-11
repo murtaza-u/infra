@@ -131,7 +131,7 @@ resource "oci_core_instance" "srv_oci_instances" {
     assign_public_ip          = true
     subnet_id                 = oci_core_subnet.kubernetes_cluster.id
   }
-  display_name = "srv-oci-${count.index + 1}"
+  display_name = "srv-oci-${count.index}"
   instance_options {
     are_legacy_imds_endpoints_disabled = true
   }
@@ -143,6 +143,6 @@ resource "oci_core_instance" "srv_oci_instances" {
   }
   preserve_boot_volume = false
   metadata = {
-    ssh_authorized_keys = var.oci_instance_authorized_pub_key
+    ssh_authorized_keys = var.install_ssh_pub_key
   }
 }

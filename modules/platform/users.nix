@@ -8,28 +8,28 @@
     # We have two users on the system.
     #
     # `murtaza`: normal user
-    # `scout`: used in CI/CD workflows
+    # `ops`: used in CI/CD workflows
     users.users = {
       murtaza = {
         isNormalUser = true;
         initialPassword = "ihatenix";
         extraGroups = [ "wheel" ];
         openssh.authorizedKeys.keys = [
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMl6JwHVx+8qlgfeB18mNSAPvIgT9j8P9j8eNyF6GJ/3"
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIInL6jKG3tfNfX3E5xsrnqOcnSVTz+gSJOm+8tO7qjCU"
         ];
       };
-      scout = {
+      ops = {
         isNormalUser = true;
         openssh.authorizedKeys.keys = [
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAWGnWp1gsGnzlbZh6ie4IZE1p226lkzGCzfGgApYV5C"
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK0SilUNT21sJMMxgmdmWSuAZAxdhQfeNOP5kLfSeYL+"
         ];
       };
     };
 
-    # Enable password-less sudo for `scout` user.
+    # Enable password-less sudo for `ops` user.
     security.sudo.extraRules = [
       {
-        users = [ "scout" ];
+        users = [ "ops" ];
         commands = [
           {
             command = "ALL";

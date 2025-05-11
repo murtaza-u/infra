@@ -3,13 +3,26 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
     unstable-nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    flake-registry = {
+      url = "github:nixos/flake-registry";
+      flake = false;
+    };
     flake-utils.url = "github:numtide/flake-utils";
     sops-nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    disko = {
+      url = "github:nix-community/disko?ref=v1.11.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
   outputs = { nixpkgs, flake-utils, ... }@inputs:
+    let
+      mkSystem = import ./lib/mksystem.nix {
+        inherit nixpkgs inputs;
+      };
+    in
     flake-utils.lib.eachDefaultSystem
       (system:
         let
@@ -51,20 +64,11 @@
     //
     {
       nixosConfigurations = {
-        srv-cloud-0 = nixpkgs.lib.nixosSystem {
+        srv-oci-0 = mkSystem "srv-oci-0" rec {
           system = "aarch64-linux";
-          pkgs = import nixpkgs { system = "aarch64-linux"; };
-          modules = [
-            {
-              nix.registry.nixpkgs.flake = nixpkgs;
-              system.stateVersion = "24.11";
-            }
-            ./hosts/srv-cloud-0
-            ./modules
-            inputs.sops-nix.nixosModules.sops
-          ];
+          pkgs = import nixpkgs { inherit system; };
         };
-        srv-onprem-0 = nixpkgs.lib.nixosSystem rec {
+        srv-onprem-0 = mkSystem "srv-onprem-0" rec {
           system = "x86_64-linux";
           pkgs = import nixpkgs {
             inherit system;
@@ -73,15 +77,6 @@
               "aspnetcore-runtime-6.0.36"
             ];
           };
-          modules = [
-            {
-              nix.registry.nixpkgs.flake = nixpkgs;
-              system.stateVersion = "24.11";
-            }
-            ./hosts/srv-onprem-0
-            ./modules
-            inputs.sops-nix.nixosModules.sops
-          ];
         };
       };
     };

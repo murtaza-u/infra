@@ -47,8 +47,20 @@ variable "oci_instance_shape" {
   description = "Instance shape"
 }
 
-variable "oci_instance_authorized_pub_key" {
+variable "install_ssh_pub_key" {
   type        = string
-  description = "Public key to be added as an authorized key to the instances."
+  description = "SSH public key to be added as an authorized key to the instances for nix-install"
+  sensitive   = true
+}
+
+variable "install_ssh_priv_key" {
+  type        = string
+  description = "SSH private key to be used to connect to the instances during nix-install"
+  sensitive   = true
+}
+
+variable "ops_ssh_priv_key" {
+  type        = string
+  description = "SSH private key to be used to connect to the instances during nix-rebuild"
   sensitive   = true
 }
