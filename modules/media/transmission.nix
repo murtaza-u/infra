@@ -16,7 +16,7 @@
       enable = true;
       package = pkgs.transmission_4;
       openPeerPorts = true;
-      openRPCPort = true;
+      openRPCPort = false;
       downloadDirPermissions = "777";
       credentialsFile = config.media.transmission.credentialsFile;
       settings = rec {

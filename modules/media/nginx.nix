@@ -1,5 +1,6 @@
 { lib, config, ... }:
 let
+  transmissionPort = 9091;
   jellyfinPort = 8096;
   jellyseerPort = 5055;
   sonarrPort = 8989;
@@ -34,6 +35,19 @@ in
       recommendedProxySettings = true;
       recommendedTlsSettings = config.media.reverseProxies.enableTLS;
       virtualHosts = {
+        "transmission.${config.media.reverseProxies.domain}" = lib.mkIf config.media.transmission.enable {
+          forceSSL = config.media.reverseProxies.enableTLS;
+          useACMEHost = config.media.reverseProxies.useACMEHost;
+          locations = {
+            "/" = {
+              proxyPass = "http://localhost:${toString transmissionPort}";
+              recommendedProxySettings = true;
+              extraConfig = ''
+                proxy_pass_header X-Transmission-Session-Id;
+              '';
+            };
+          };
+        };
         "jellyfin.${config.media.reverseProxies.domain}" = lib.mkIf config.media.jellyfin.enable {
           forceSSL = config.media.reverseProxies.enableTLS;
           useACMEHost = config.media.reverseProxies.useACMEHost;

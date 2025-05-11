@@ -47,7 +47,7 @@
   sops = {
     defaultSopsFile = ../../secrets.yaml;
     validateSopsFiles = false;
-    age.sshKeyPaths = [ "/home/${config.users.users.ops.name}/.ssh/id_ed25519" ];
+    age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
     secrets = {
       "transmission/rpc_user" = {
         mode = "0400";

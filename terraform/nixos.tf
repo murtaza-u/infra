@@ -32,7 +32,9 @@ module "deploy" {
   target_host                = each.value.ip
   target_user                = "ops"
   deployment_ssh_key         = var.ops_ssh_priv_key
+  extra_files_script         = "${path.module}/hack/ssh-host-key.sh"
+  extra_environment          = { SSH_HOST_KEY = var.ops_ssh_priv_key }
   instance_id                = each.value.id # when instance id changes, it will trigger a reinstall
-  debug_logging              = false         # useful if something goes wrong
+  debug_logging              = true          # useful if something goes wrong
   build_on_remote            = false         # build the closure on the remote machine instead of locally
 }
