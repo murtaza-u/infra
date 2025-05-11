@@ -3,6 +3,7 @@ locals {
     [
       # srv-oci-*
       for i in oci_core_instance.srv_oci_instances : {
+        id       = i.id
         hostname = i.display_name
         username = "opc"
         ip       = i.public_ip
@@ -11,6 +12,7 @@ locals {
     [
       # srv-onprem-*
       {
+        id       = "385efd9b-9b2b-48a7-8f6a-c7011a19d940"
         hostname = "srv-onprem-0"
         username = "nixos"
         ip       = "192.168.29.5"
@@ -30,7 +32,7 @@ module "deploy" {
   target_host                = each.value.ip
   target_user                = "ops"
   deployment_ssh_key         = var.ops_ssh_priv_key
-  instance_id                = each.value.ip # when instance id changes, it will trigger a reinstall
+  instance_id                = each.value.id # when instance id changes, it will trigger a reinstall
   debug_logging              = false         # useful if something goes wrong
   build_on_remote            = false         # build the closure on the remote machine instead of locally
 }
