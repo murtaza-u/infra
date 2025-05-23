@@ -1,3 +1,6 @@
+#########
+## OCI ##
+#########
 variable "oci_region" {
   type        = string
   default     = "ap-mumbai-1"
@@ -47,6 +50,9 @@ variable "oci_instance_shape" {
   description = "Instance shape"
 }
 
+###########
+## NixOS ##
+###########
 variable "install_ssh_pub_key" {
   type        = string
   description = "SSH public key to be added as an authorized key to the instances for nix-install"

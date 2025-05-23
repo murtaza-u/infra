@@ -145,4 +145,9 @@ resource "oci_core_instance" "srv_oci_instances" {
   metadata = {
     ssh_authorized_keys = var.install_ssh_pub_key
   }
+  lifecycle {
+    ignore_changes = [
+      source_details[0].source_id
+    ]
+  }
 }
