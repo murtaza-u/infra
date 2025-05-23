@@ -99,6 +99,7 @@
     arr.enable = true;
     jellyseerr.enable = true;
     jellyfin.enable = true;
+    syncthing.enable = true;
     reverseProxies = {
       enable = true;
       domain = "home.murtazau.xyz";

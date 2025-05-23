@@ -6,6 +6,7 @@ let
   sonarrPort = 8989;
   radarrPort = 7878;
   prowlarrPort = 9696;
+  syncthingPort = 8384;
 in
 {
   options = {
@@ -118,6 +119,24 @@ in
             "/api" = {
               proxyPass = "http://localhost:${toString prowlarrPort}";
               recommendedProxySettings = true;
+            };
+          };
+        };
+        "syncthing.${config.media.reverseProxies.domain}" = lib.mkIf config.media.syncthing.enable {
+          forceSSL = config.media.reverseProxies.enableTLS;
+          useACMEHost = config.media.reverseProxies.useACMEHost;
+          locations = {
+            "/" = {
+              proxyPass = "http://localhost:${toString syncthingPort}";
+              recommendedProxySettings = false;
+              extraConfig = ''
+                proxy_set_header Host 127.0.0.1;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_set_header X-Forwarded-Host $host;
+                proxy_set_header X-Forwarded-Server $host;
+              '';
             };
           };
         };

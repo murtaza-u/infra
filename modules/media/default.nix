@@ -5,5 +5,6 @@
     ./jellyfin.nix
     ./jellyseerr.nix
     ./nginx.nix
+    ./syncthing.nix
   ];
 }
