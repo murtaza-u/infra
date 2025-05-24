@@ -2,9 +2,9 @@
 # Manual edits may be lost in future updates.
 
 provider "registry.terraform.io/hashicorp/external" {
-  version = "2.3.4"
+  version = "2.3.5"
   hashes = [
-    "h1:AnkUXpQ84pK7I6i1s3hJ+kdumyeVq2Nbua7UOix9SV8=",
+    "h1:Dg4NoJYEclgU1+bax3u1l1vsrGrRTff0x0ef1nOeJtI=",
   ]
 }
 
@@ -16,9 +16,9 @@ provider "registry.terraform.io/hashicorp/null" {
 }
 
 provider "registry.terraform.io/oracle/oci" {
-  version     = "6.35.0"
-  constraints = "6.35.0"
+  version     = "7.0.0"
+  constraints = "7.0.0"
   hashes = [
-    "h1:JizAhAKZNbmZkEkS7TwqaJADRDpz+1nQRpU5LDyIhk8=",
+    "h1:5UdbUpBYMZI6corzyBnIJHAV/+ZAiAZVxkDLQHeuysE=",
   ]
 }

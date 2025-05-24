@@ -1,7 +1,7 @@
 {
   description = "Lab on a Shoestring";
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
     unstable-nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-registry = {
       url = "github:nixos/flake-registry";
@@ -57,6 +57,7 @@
                 external
                 oci
               ]))
+              (import ./hack/kubelogin { pkgs = unstable; })
             ];
           };
         }
@@ -67,6 +68,7 @@
         srv-oci-0 = mkSystem "srv-oci-0" rec {
           system = "aarch64-linux";
           pkgs = import nixpkgs { inherit system; };
+          unstable = import inputs.unstable-nixpkgs { inherit system; };
         };
         srv-onprem-0 = mkSystem "srv-onprem-0" rec {
           system = "x86_64-linux";

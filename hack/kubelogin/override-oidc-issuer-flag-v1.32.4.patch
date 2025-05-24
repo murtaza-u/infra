@@ -1,0 +1,173 @@
+diff --git a/pkg/cmd/get_token.go b/pkg/cmd/get_token.go
+index 5765472..fa29974 100644
+--- a/pkg/cmd/get_token.go
++++ b/pkg/cmd/get_token.go
+@@ -14,6 +14,7 @@ import (
+ // getTokenOptions represents the options for get-token command.
+ type getTokenOptions struct {
+ 	IssuerURL             string
++	IssuerURLOverride     string
+ 	ClientID              string
+ 	ClientSecret          string
+ 	ExtraScopes           []string
+@@ -27,6 +28,7 @@ type getTokenOptions struct {
+ 
+ func (o *getTokenOptions) addFlags(f *pflag.FlagSet) {
+ 	f.StringVar(&o.IssuerURL, "oidc-issuer-url", "", "Issuer URL of the provider (mandatory)")
++	f.StringVar(&o.IssuerURLOverride, "oidc-issuer-url-override", "", "Override Issuer URL")
+ 	f.StringVar(&o.ClientID, "oidc-client-id", "", "Client ID of the provider (mandatory)")
+ 	f.StringVar(&o.ClientSecret, "oidc-client-secret", "", "Client secret of the provider")
+ 	f.StringSliceVar(&o.ExtraScopes, "oidc-extra-scope", nil, "Scopes to request to the provider")
+@@ -82,12 +84,13 @@ func (cmd *GetToken) New() *cobra.Command {
+ 			}
+ 			in := credentialplugin.Input{
+ 				Provider: oidc.Provider{
+-					IssuerURL:      o.IssuerURL,
+-					ClientID:       o.ClientID,
+-					ClientSecret:   o.ClientSecret,
+-					PKCEMethod:     pkceMethod,
+-					UseAccessToken: o.UseAccessToken,
+-					ExtraScopes:    o.ExtraScopes,
++					IssuerURL:         o.IssuerURL,
++					IssuerURLOverride: o.IssuerURLOverride,
++					ClientID:          o.ClientID,
++					ClientSecret:      o.ClientSecret,
++					PKCEMethod:        pkceMethod,
++					UseAccessToken:    o.UseAccessToken,
++					ExtraScopes:       o.ExtraScopes,
+ 				},
+ 				ForceRefresh:     o.ForceRefresh,
+ 				TokenCacheConfig: tokenCacheConfig,
+diff --git a/pkg/cmd/setup.go b/pkg/cmd/setup.go
+index 1e57c8f..75e30d1 100644
+--- a/pkg/cmd/setup.go
++++ b/pkg/cmd/setup.go
+@@ -13,6 +13,7 @@ import (
+ // setupOptions represents the options for setup command.
+ type setupOptions struct {
+ 	IssuerURL             string
++	IssuerURLOverride     string
+ 	ClientID              string
+ 	ClientSecret          string
+ 	ExtraScopes           []string
+@@ -24,6 +25,7 @@ type setupOptions struct {
+ 
+ func (o *setupOptions) addFlags(f *pflag.FlagSet) {
+ 	f.StringVar(&o.IssuerURL, "oidc-issuer-url", "", "Issuer URL of the provider")
++	f.StringVar(&o.IssuerURLOverride, "oidc-issuer-url-override", "", "Overrided Issuer URL of the provider")
+ 	f.StringVar(&o.ClientID, "oidc-client-id", "", "Client ID of the provider")
+ 	f.StringVar(&o.ClientSecret, "oidc-client-secret", "", "Client secret of the provider")
+ 	f.StringSliceVar(&o.ExtraScopes, "oidc-extra-scope", nil, "Scopes to request to the provider")
+@@ -71,15 +73,16 @@ func (cmd *Setup) New() *cobra.Command {
+ 				return fmt.Errorf("setup: %w", err)
+ 			}
+ 			in := setup.Input{
+-				IssuerURL:       o.IssuerURL,
+-				ClientID:        o.ClientID,
+-				ClientSecret:    o.ClientSecret,
+-				ExtraScopes:     o.ExtraScopes,
+-				UseAccessToken:  o.UseAccessToken,
+-				PKCEMethod:      pkceMethod,
+-				GrantOptionSet:  grantOptionSet,
+-				TLSClientConfig: o.tlsOptions.tlsClientConfig(),
+-				ChangedFlags:    changedFlags,
++				IssuerURL:         o.IssuerURL,
++				IssuerURLOverride: o.IssuerURLOverride,
++				ClientID:          o.ClientID,
++				ClientSecret:      o.ClientSecret,
++				ExtraScopes:       o.ExtraScopes,
++				UseAccessToken:    o.UseAccessToken,
++				PKCEMethod:        pkceMethod,
++				GrantOptionSet:    grantOptionSet,
++				TLSClientConfig:   o.tlsOptions.tlsClientConfig(),
++				ChangedFlags:      changedFlags,
+ 			}
+ 			if in.IssuerURL == "" || in.ClientID == "" {
+ 				return c.Help()
+diff --git a/pkg/oidc/client/factory.go b/pkg/oidc/client/factory.go
+index ebcd9cd..c211a89 100644
+--- a/pkg/oidc/client/factory.go
++++ b/pkg/oidc/client/factory.go
+@@ -53,6 +53,9 @@ func (f *Factory) New(ctx context.Context, prov oidc.Provider, tlsClientConfig t
+ 	}
+ 
+ 	ctx = context.WithValue(ctx, oauth2.HTTPClient, httpClient)
++	if prov.IssuerURLOverride != "" {
++		ctx = gooidc.InsecureIssuerURLContext(ctx, prov.IssuerURLOverride)
++	}
+ 	provider, err := gooidc.NewProvider(ctx, prov.IssuerURL)
+ 	if err != nil {
+ 		return nil, fmt.Errorf("oidc discovery error: %w", err)
+diff --git a/pkg/oidc/oidc.go b/pkg/oidc/oidc.go
+index f10ae35..045ad95 100644
+--- a/pkg/oidc/oidc.go
++++ b/pkg/oidc/oidc.go
+@@ -11,12 +11,13 @@ import (
+ 
+ // Provider represents an OIDC provider.
+ type Provider struct {
+-	IssuerURL      string
+-	ClientID       string
+-	ClientSecret   string   // optional
+-	ExtraScopes    []string // optional
+-	PKCEMethod     PKCEMethod
+-	UseAccessToken bool
++	IssuerURL         string
++	IssuerURLOverride string // optional
++	ClientID          string
++	ClientSecret      string   // optional
++	ExtraScopes       []string // optional
++	PKCEMethod        PKCEMethod
++	UseAccessToken    bool
+ }
+ 
+ // PKCEMethod represents a preferred method of PKCE.
+diff --git a/pkg/usecases/setup/setup.go b/pkg/usecases/setup/setup.go
+index dcee9da..537ebf0 100644
+--- a/pkg/usecases/setup/setup.go
++++ b/pkg/usecases/setup/setup.go
+@@ -39,27 +39,29 @@ var setupTemplate = template.Must(template.New("setup.md").Funcs(template.FuncMa
+ }).Parse(setupMarkdown))
+ 
+ type Input struct {
+-	IssuerURL       string
+-	ClientID        string
+-	ClientSecret    string
+-	ExtraScopes     []string
+-	UseAccessToken  bool
+-	PKCEMethod      oidc.PKCEMethod
+-	GrantOptionSet  authentication.GrantOptionSet
+-	TLSClientConfig tlsclientconfig.Config
+-	ChangedFlags    []string
++	IssuerURL         string
++	IssuerURLOverride string
++	ClientID          string
++	ClientSecret      string
++	ExtraScopes       []string
++	UseAccessToken    bool
++	PKCEMethod        oidc.PKCEMethod
++	GrantOptionSet    authentication.GrantOptionSet
++	TLSClientConfig   tlsclientconfig.Config
++	ChangedFlags      []string
+ }
+ 
+ func (u Setup) Do(ctx context.Context, in Input) error {
+ 	u.Logger.Printf("Authentication in progress...")
+ 	out, err := u.Authentication.Do(ctx, authentication.Input{
+ 		Provider: oidc.Provider{
+-			IssuerURL:      in.IssuerURL,
+-			ClientID:       in.ClientID,
+-			ClientSecret:   in.ClientSecret,
+-			ExtraScopes:    in.ExtraScopes,
+-			PKCEMethod:     in.PKCEMethod,
+-			UseAccessToken: in.UseAccessToken,
++			IssuerURL:         in.IssuerURL,
++			IssuerURLOverride: in.IssuerURLOverride,
++			ClientID:          in.ClientID,
++			ClientSecret:      in.ClientSecret,
++			ExtraScopes:       in.ExtraScopes,
++			PKCEMethod:        in.PKCEMethod,
++			UseAccessToken:    in.UseAccessToken,
+ 		},
+ 		GrantOptionSet:  in.GrantOptionSet,
+ 		TLSClientConfig: in.TLSClientConfig,

@@ -1,3 +1,5 @@
+{ terraform, extraArgs, ... }:
+
 {
   imports = [
     ./hardware.nix
@@ -13,9 +15,22 @@
 
   networking = {
     # Set hostname.
-    hostName = "srv-oci-0";
+    hostName = terraform.hostname;
     # Use firewall provided by the underlying cloud provider's infrastructure.
     firewall.enable = false;
+  };
+
+  sops = {
+    defaultSopsFile = ../../secrets.yaml;
+    validateSopsFiles = false;
+    age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+    secrets = {
+      "k3s_token" = {
+        mode = "0400";
+        owner = "root";
+        group = "root";
+      };
+    };
   };
 
   platform = {
@@ -27,7 +42,27 @@
     ssh.enable = true;
     # enable timesyncd service
     synctime.enable = true;
+    # setup K3S
+    k3s = {
+      enable = true;
+      package = extraArgs.unstable.k3s_1_33;
+      role = "server";
+      nodeIP = terraform.private_ip;
+      oidcIssuerURL = terraform.oidc_issuer_url;
+      oidcDiscoveryURL = terraform.oidc_discovery_url;
+      oidcClientID = terraform.oidc_client_id;
+      oidcAudiences = [ terraform.oidc_issuer_url ];
+      oidcExtraScope = [ "get_groups" ];
+      oidcGroupsClaimExpression = ''dyn(claims.groups).map(g, "oci:" + g.name)'';
+      oidcUsernameClaimExpression = ''"oci:" + claims.sub'';
+      oidcAdminSubjects = [
+        {
+          kind = "Group";
+          name = "oci:Domain_Administrators";
+        }
+      ];
+    };
   };
 
-  system.stateVersion = "24.11";
+  system.stateVersion = "25.05";
 }

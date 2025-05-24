@@ -3,13 +3,14 @@
 name:
 { system
 , pkgs
-}:
+, ...
+} @ extraArgs:
 
 nixpkgs.lib.nixosSystem {
   inherit system pkgs;
 
   specialArgs = {
-    inherit nixpkgs inputs;
+    inherit nixpkgs inputs extraArgs;
   };
 
   modules = [
