@@ -159,6 +159,7 @@ in
         "--kube-scheduler-arg bind-address=0.0.0.0"
         "--kube-proxy-arg metrics-bind-address=0.0.0.0"
         "--kube-apiserver-arg anonymous-auth=false"
+        "--disable traefik,local-storage"
       ]
       ++ lib.optional isServer ''
         --kube-apiserver-arg authentication-config=${config.environment.etc."k3s/authentication-configuration.yaml".source}
