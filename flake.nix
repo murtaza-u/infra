@@ -19,7 +19,7 @@
   };
   outputs = { nixpkgs, flake-utils, ... }@inputs:
     let
-      mkSystem = import ./lib/mksystem.nix {
+      mkSystem = import ./nixos/lib/mksystem.nix {
         inherit nixpkgs inputs;
       };
     in
@@ -52,14 +52,15 @@
               kubeseal
               oci-cli
               terraform-ls
-              (terraform.withPlugins (p: with p; [
-                p.null
-                external
-                oci
-                http
-                local
-                github
-              ]))
+              terraform
+              # (terraform.withPlugins (p: with p; [
+              #   p.null
+              #   external
+              #   oci
+              #   http
+              #   local
+              #   github
+              # ]))
               (import ./hack/kubelogin { pkgs = unstable; })
             ];
           };

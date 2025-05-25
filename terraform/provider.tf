@@ -3,23 +3,23 @@ terraform {
   required_providers {
     oci = {
       source  = "oracle/oci"
-      version = "7.0.0"
+      version = "7.2.0"
     }
     http = {
       source  = "hashicorp/http"
       version = "3.5.0"
     }
-    flux = {
-      source  = "fluxcd/flux"
-      version = "1.5.1"
-    }
-    local = {
-      source  = "hashicorp/local"
-      version = "2.5.2"
+    null = {
+      source  = "hashicorp/null"
+      version = "3.2.4"
     }
     github = {
       source  = "integrations/github"
       version = "6.6.0"
+    }
+    flux = {
+      source  = "fluxcd/flux"
+      version = "1.5.1"
     }
   }
   cloud {
@@ -44,7 +44,9 @@ provider "http" {}
 
 provider "flux" {
   kubernetes = {
-    config_path = local_file.kubeconfig.filename
+    host     = var.kubeapi_server_addr
+    insecure = true
+    token    = local.access_token
   }
   git = {
     url = "https://github.com/${var.github_owner}/${var.github_repository}"
