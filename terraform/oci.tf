@@ -222,6 +222,19 @@ resource "oci_core_instance" "srv_oci_instances" {
   }
 }
 
+resource "oci_identity_domains_setting" "lab_domain_settings" {
+  idcs_endpoint              = oci_identity_domain.lab.url
+  csr_access                 = "none"
+  schemas                    = ["urn:ietf:params:scim:schemas:oracle:idcs:Settings"]
+  setting_id                 = "Settings"
+  signing_cert_public_access = true
+  custom_branding            = true
+  company_names {
+    locale = "en-US"
+    value  = "MovingBunkerLabs"
+  }
+}
+
 resource "oci_identity_domains_app" "k3s_idp" {
   based_on_template {
     value         = "CustomWebAppTemplateId"
@@ -233,7 +246,7 @@ resource "oci_identity_domains_app" "k3s_idp" {
     "urn:ietf:params:scim:schemas:oracle:idcs:App",
     "urn:ietf:params:scim:schemas:oracle:idcs:extension:OCITags"
   ]
-  description             = "Kubernetes Authentication with OIDC"
+  description             = "Kubernetes OIDC Authentication"
   show_in_my_apps         = true
   active                  = true
   access_token_expiry     = 3600
