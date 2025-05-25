@@ -56,6 +56,9 @@
                 p.null
                 external
                 oci
+                http
+                local
+                github
               ]))
               (import ./hack/kubelogin { pkgs = unstable; })
             ];

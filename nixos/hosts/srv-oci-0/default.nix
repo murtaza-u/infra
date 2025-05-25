@@ -1,4 +1,4 @@
-{ terraform, extraArgs, ... }:
+{ lib, terraform, extraArgs, ... }:
 
 {
   imports = [
@@ -21,7 +21,7 @@
   };
 
   sops = {
-    defaultSopsFile = ../../secrets.yaml;
+    defaultSopsFile = ../../../secrets.yaml;
     validateSopsFiles = false;
     age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
     secrets = {
@@ -51,14 +51,21 @@
       oidcIssuerURL = terraform.oidc_issuer_url;
       oidcDiscoveryURL = terraform.oidc_discovery_url;
       oidcClientID = terraform.oidc_client_id;
-      oidcAudiences = [ terraform.oidc_issuer_url ];
+      oidcAudiences = [
+        terraform.oidc_issuer_url
+        (lib.removeSuffix ":443/.well-known/openid-configuration" terraform.oidc_discovery_url)
+      ];
       oidcExtraScope = [ "get_groups" ];
-      oidcGroupsClaimExpression = ''dyn(claims.groups).map(g, "oci:" + g.name)'';
+      oidcGroupsClaimExpression = ''has(claims.groups) ? dyn(claims.groups).map(g, "oci:" + g.name) : []'';
       oidcUsernameClaimExpression = ''"oci:" + claims.sub'';
       oidcAdminSubjects = [
         {
           kind = "Group";
           name = "oci:Domain_Administrators";
+        }
+        {
+          kind = "User";
+          name = "oci:${terraform.oidc_client_id}";
         }
       ];
     };

@@ -28,7 +28,7 @@ module "deploy" {
   source                     = "github.com/nix-community/nixos-anywhere//terraform/all-in-one?ref=1.9.0"
   nixos_system_attr          = ".#nixosConfigurations.${each.value.hostname}.config.system.build.toplevel"
   nixos_partitioner_attr     = ".#nixosConfigurations.${each.value.hostname}.config.system.build.diskoScript"
-  nixos_generate_config_path = "../hosts/${each.value.hostname}/hardware.nix"
+  nixos_generate_config_path = "../nixos/hosts/${each.value.hostname}/hardware.nix"
   install_user               = each.value.username
   install_ssh_key            = var.install_ssh_priv_key
   target_host                = each.value.public_ip != null ? each.value.public_ip : each.value.private_ip
@@ -49,7 +49,7 @@ module "deploy" {
       startswith(each.value.hostname, "srv-onprem-") ? {} : {
         oidc_issuer_url    = "https://identity.oraclecloud.com/"
         oidc_discovery_url = "${oci_identity_domains_app.k3s_idp.idcs_endpoint}/.well-known/openid-configuration"
-        oidc_client_id     = oci_identity_domains_app.k3s_idp.id
+        oidc_client_id     = oci_identity_domains_app.k3s_idp.name
       }
     )
   }

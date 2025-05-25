@@ -5,6 +5,22 @@ terraform {
       source  = "oracle/oci"
       version = "7.0.0"
     }
+    http = {
+      source  = "hashicorp/http"
+      version = "3.5.0"
+    }
+    flux = {
+      source  = "fluxcd/flux"
+      version = "1.5.1"
+    }
+    local = {
+      source  = "hashicorp/local"
+      version = "2.5.2"
+    }
+    github = {
+      source  = "integrations/github"
+      version = "6.6.0"
+    }
   }
   cloud {
     organization = "murtaza-u"
@@ -22,4 +38,22 @@ provider "oci" {
   fingerprint          = var.oci_auth_key_fingerprint
   private_key_path     = var.oci_auth_private_key_file_path
   private_key_password = var.oci_auth_private_key_password
+}
+
+provider "http" {}
+
+provider "flux" {
+  kubernetes = {
+    config_path = local_file.kubeconfig.filename
+  }
+  git = {
+    url = "https://github.com/${var.github_owner}/${var.github_repository}"
+    http = {
+      username = "git"
+      password = var.github_token
+    }
+    author_email = "bot@fluxcd.io"
+    author_name  = "Flux Bot"
+    branch       = "redefine"
+  }
 }

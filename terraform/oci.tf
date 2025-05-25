@@ -253,7 +253,7 @@ resource "oci_identity_domains_app" "k3s_idp" {
   all_url_schemes_allowed = true
   allow_access_control    = false
   allow_offline           = true
-  allowed_grants          = ["authorization_code", "refresh_token"]
+  allowed_grants          = ["authorization_code", "client_credentials"]
   audience                = "k3s"
   bypass_consent          = false
   client_ip_checking      = "anywhere"
