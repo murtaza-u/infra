@@ -44,7 +44,7 @@ provider "http" {}
 
 provider "flux" {
   kubernetes = {
-    host     = var.kubeapi_server_addr
+    host     = "https://${oci_core_instance.srv_oci_instances[0].public_ip}:6443"
     insecure = true
     token    = local.access_token
   }

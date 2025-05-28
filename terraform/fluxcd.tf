@@ -10,7 +10,7 @@ locals {
     clusters = [{
       name = "k3s"
       cluster = {
-        server                   = var.kubeapi_server_addr
+        server                   = "https://${oci_core_instance.srv_oci_instances[0].public_ip}:6443"
         insecure-skip-tls-verify = true
       }
     }]
@@ -64,13 +64,17 @@ resource "github_repository" "infra" {
 
 resource "null_resource" "wait_for_k3s" {
   provisioner "local-exec" {
+    environment = {
+      KUBECONFIG_RAW = local.kubeconfig
+    }
     command = <<EOF
-    echo "${local.kubeconfig}" > "/tmp/$(mktemp)/kubeconfig.yaml"
-    export KUBECONFIG=/tmp/kubeconfig.yaml
-    for i in {1..30}; do
-      kubectl get nodes --no-headers | awk '{print $2}' | grep -qv "Ready" && sleep 30s || exit 0
-    done
-    exit 1
+      set -euo pipefail
+      export KUBECONFIG="/tmp/kubeconfig"
+      echo "$KUBECONFIG_RAW" > "$KUBECONFIG"
+      for i in {1..30}; do
+        kubectl get nodes --no-headers | awk '{print $2}' | grep -qv "Ready" && sleep 30s || exit 0
+      done
+      exit 1
     EOF
   }
 }

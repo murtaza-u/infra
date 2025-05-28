@@ -74,12 +74,6 @@ variable "ops_ssh_priv_key" {
 ############
 ## FluxCD ##
 ############
-variable "kubeapi_server_addr" {
-  type        = string
-  description = "KubeAPI server address"
-  sensitive   = true
-}
-
 variable "github_owner" {
   description = "GitHub owner/organisation name"
   type        = string
