@@ -47,22 +47,10 @@ data "http" "oidc_token" {
   }
 }
 
-resource "github_repository" "infra" {
-  name                 = var.github_repository
-  description          = "Homelab on a Shoestring"
-  visibility           = "public"
-  has_issues           = true
-  has_discussions      = true
-  has_projects         = false
-  has_wiki             = false
-  vulnerability_alerts = true
-  auto_init            = false
-  lifecycle {
-    prevent_destroy = true
-  }
-}
-
 resource "null_resource" "wait_for_k3s" {
+  depends_on = [
+    module.nixos_anywhere["srv-oci-0"]
+  ]
   provisioner "local-exec" {
     environment = {
       KUBECONFIG_RAW = local.kubeconfig
@@ -80,7 +68,7 @@ resource "null_resource" "wait_for_k3s" {
 }
 
 resource "flux_bootstrap_git" "infra" {
-  depends_on = [github_repository.infra, null_resource.wait_for_k3s]
+  depends_on = [null_resource.wait_for_k3s]
   components_extra = [
     "image-reflector-controller",
     "image-automation-controller"

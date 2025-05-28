@@ -53,14 +53,6 @@
               oci-cli
               terraform-ls
               terraform
-              # (terraform.withPlugins (p: with p; [
-              #   p.null
-              #   external
-              #   oci
-              #   http
-              #   local
-              #   github
-              # ]))
               (import ./hack/kubelogin { pkgs = unstable; })
             ];
           };

@@ -1,7 +1,5 @@
----
 formatter:
   type: basic
-  include_document_start: true
 exclude:
-  - clusters/homelab/flux-system
+  - kubernetes/clusters/homelab/flux-system
   - secrets.yaml

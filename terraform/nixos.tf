@@ -1,22 +1,20 @@
 locals {
-  hosts = flatten([
-    [
-      for i in oci_core_instance.srv_oci_instances : {
-        id         = i.id
-        hostname   = i.display_name
-        username   = "opc"
-        public_ip  = i.public_ip
-        private_ip = i.private_ip
-      }
-    ]
-  ])
+  hosts = [
+    for i in oci_core_instance.srv_oci_instances : {
+      id         = i.id
+      hostname   = i.display_name
+      username   = "opc"
+      public_ip  = i.public_ip
+      private_ip = i.private_ip
+    }
+  ]
 }
 
-module "deploy" {
+module "nixos_anywhere" {
   for_each                   = { for host in local.hosts : host.hostname => host }
-  source                     = "github.com/nix-community/nixos-anywhere//terraform/all-in-one?ref=1.9.0"
-  nixos_system_attr          = ".#nixosConfigurations.${each.value.hostname}.config.system.build.toplevel"
-  nixos_partitioner_attr     = ".#nixosConfigurations.${each.value.hostname}.config.system.build.diskoScript"
+  source                     = "github.com/nix-community/nixos-anywhere//terraform/all-in-one?ref=1.10.0"
+  nixos_system_attr          = "../#nixosConfigurations.${each.value.hostname}.config.system.build.toplevel"
+  nixos_partitioner_attr     = "../#nixosConfigurations.${each.value.hostname}.config.system.build.diskoScript"
   nixos_generate_config_path = "../nixos/hosts/${each.value.hostname}/hardware.nix"
   install_user               = each.value.username
   install_ssh_key            = var.install_ssh_priv_key
