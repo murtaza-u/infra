@@ -11,5 +11,5 @@ resource "flux_bootstrap_git" "lab" {
   # keep the namespace after uninstalling Flux components.
   keep_namespace = false
   namespace      = "flux-system"
-  path           = "kubernetes/clusters/homelab"
+  path           = "kubernetes/clusters/lab"
 }
