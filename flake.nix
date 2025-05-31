@@ -44,27 +44,31 @@
         in
         {
           formatter = pkgs.nixpkgs-fmt;
-          devShells.default = pkgs.mkShell {
-            packages = with unstable; [
-              nixd
-              nixpkgs-fmt
-              tflint
-              sops
-              ssh-to-age
-              yamlfmt
-              yamllint
-              kubectl
-              fluxcd
-              kubernetes-helm
-              kustomize
-              kubeseal
-              oci-cli
-              terraform-ls
-              terraform
-              just
-              (import ./hack/kubelogin { pkgs = unstable; })
-              inputs.nixos-anywhere.packages.${system}.nixos-anywhere
-            ];
+          devShells = {
+            default = pkgs.mkShell {
+              packages = with unstable; [
+                nixd
+                nixpkgs-fmt
+                tflint
+                tfsec
+                sops
+                ssh-to-age
+                yamlfmt
+                yamllint
+                kubectl
+                fluxcd
+                kubernetes-helm
+                kustomize
+                kubeseal
+                oci-cli
+                terraform-ls
+                terraform
+                just
+                jq
+                inputs.nixos-anywhere.packages.${system}.nixos-anywhere
+                (import ./hack/kubelogin { pkgs = unstable; })
+              ];
+            };
           };
         }
       )

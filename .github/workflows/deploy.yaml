@@ -1,0 +1,232 @@
+name: Deploy infrastructure using Terraform & NixOS
+
+# yamllint disable-line rule:truthy
+on:
+  push:
+    branches:
+      - redefine
+  pull_request:
+
+permissions:
+  contents: write
+
+env:
+  TF_VAR_oci_tenant_id: ${{ secrets.OCI_TENANT_ID }}
+  TF_VAR_oci_auth_user_id: ${{ secrets.OCI_AUTH_USER_ID }}
+  TF_VAR_oci_auth_key_fingerprint: ${{ secrets.OCI_AUTH_KEY_FINGERPRINT }}
+  TF_VAR_oci_auth_private_key: ${{ secrets.OCI_AUTH_PRIVATE_KEY }}
+  TF_VAR_oci_auth_private_key_password: ${{ secrets.OCI_AUTH_PRIVATE_KEY_PASSWORD }}
+  TF_VAR_oci_parent_compartment_id: ${{ secrets.OCI_PARENT_COMPARTMENT_ID }}
+  TF_VAR_oci_domain_admin_email: ${{ secrets.OCI_DOMAIN_ADMIN_EMAIL }}
+  TF_VAR_install_ssh_pub_key: ${{ secrets.INSTALL_SSH_PUB_KEY }}
+  TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+  TF_VAR_cloudfare_zone_id: ${{ secrets.CLOUDFARE_ZONE_ID }}
+  TF_VAR_github_repository: ${{ github.event.repository.name }}
+  TF_VAR_github_token: ${{ secrets.GH_PAT }}
+
+jobs:
+  terraform-ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.12.0"
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Terraform init
+        shell: bash
+        run: |
+          for config_path in terraform/*; do
+            pushd "$config_path"
+            terraform init -input=false
+            popd
+          done
+
+      - name: Terraform check formatting
+        shell: bash
+        continue-on-error: true
+        run: |
+          for config_path in terraform/*; do
+            pushd "$config_path"
+            terraform fmt -check
+            popd
+          done
+
+      - name: Terraform validate
+        shell: bash
+        run: |
+          for config_path in terraform/*; do
+            pushd "$config_path"
+            terraform validate -no-color
+            popd
+          done
+
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: v0.58.0
+
+      - name: Init TFLint
+        shell: bash
+        run: tflint --init
+
+      - name: Run TFLint
+        shell: bash
+        run: |
+          for config_path in terraform/*; do
+            pushd "$config_path"
+            tflint
+            popd
+          done
+
+      - name: Terraform Plan
+        run: |
+          pushd "terraform/oci"
+          terraform plan -no-color 2>&1 | tee "${{ github.workspace }}/oci.tfplan"
+          popd
+
+      - name: Comment Terraform OCI Plan on PR
+        if: github.event_name == 'pull_request'
+        uses: blinqas/tf-plan-pr-comment@v1
+        with:
+          output_file: ${{ github.workspace }}/oci.tfplan
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  deploy:
+    runs-on: ubuntu-latest
+    needs:
+      - terraform-ci
+    if: github.ref_name == 'redefine'
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Restore state
+        uses: actions/download-artifact@v4
+        with:
+          name: new-instances
+          path: terraform/oci/state
+        continue-on-error: true
+
+      - name: Setup terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.12.0"
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Provision Oracle Cloud Infrastructure (OCI) resources
+        shell: bash
+        run: |
+          pushd terraform/oci
+          terraform init -input=false
+          terraform apply -auto-approve
+          terraform output -json > ../../infra.json
+          popd
+
+      - name: Setup just
+        uses: extractions/setup-just@v2
+        with:
+          just-version: 1.40.0
+
+      - name: Setup nix
+        uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Restore and save Nix store
+        uses: nix-community/cache-nix-action@v6
+        with:
+          # restore and save a cache using this key
+          primary-key: nix-${{ runner.os }}-${{ hashFiles('**/*.nix', '**/flake.lock') }}
+          # if there's no cache hit, restore a cache by this prefix
+          restore-prefixes-first-match: nix-${{ runner.os }}-
+          # collect garbage until the Nix store size (in bytes) is at most this
+          # number before trying to save a new cache
+          # 1G = 1073741824
+          gc-max-store-size-linux: 8G
+
+      - name: Deploy NixOS
+        id: deploy
+        shell: bash
+        run: |
+          set -uo pipefail
+
+          # setup ssh keys
+          echo "${{ secrets.SSH_IDENTITY_FILE_INSTALL }}" > /tmp/lab-install
+          echo "${{ secrets.SSH_IDENTITY_FILE_OPS }}" > /tmp/lab-ops
+          chmod 600 /tmp/lab-install /tmp/lab-ops
+
+          export SSH_HOST_KEY=$(</tmp/lab-ops)
+          export TF_OUTPUT_JSON="$PWD/infra.json"
+
+          success_hosts=()
+          failed=0
+
+          while read -r host ip; do
+            # nixos-anywhere
+            if [[ -f "terraform/oci/state/${host}.new" ]]; then
+              echo "[+] Detected new instance: $host"
+              just target_host="opc@$ip" ssh_identity_file="/tmp/lab-install" install "$host"
+              if [[ "$?" == 0 ]]; then
+                rm terraform/oci/state/${host}.new
+                success_hosts+=("$host")
+              else
+                failed=1
+                echo "[!] Install failed: $host"
+              fi
+              continue
+            fi
+
+            # nixos-rebuild
+            echo "[*] Existing instance: $host"
+            # just target_host="ops@$ip" ssh_identity_file="/tmp/lab-ops" deploy "$host"
+            # if [[ "$?" != 0 ]]; then
+            #   failed=1
+            #   echo "[!] Rebuild failed: $host"
+            # fi
+          done <<< $(jq -r '.oci_instances.value | to_entries[] | "\(.key) \(.value.public_ip)"' infra.json)
+
+          echo "success_hosts=${success_hosts[*]}" >> "$GITHUB_OUTPUT"
+          if [[ "$failed" == 1 ]]; then
+            exit 1
+          fi
+
+      - name: Commit hardware.nix
+        if: steps.deploy.outputs.success_hosts != ''
+        run: |
+          nix fmt .
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add nixos/hosts/**/hardware.nix
+          git commit -m "feat: add hardware.nix from nixos-anywhere" || echo "No changes to commit"
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:${{ github.ref_name }}
+
+      - name: Provision FluxCD on the cluster
+        shell: bash
+        run: |
+          export TF_VAR_oci_identity_domain_id="$(jq -r '.oci_icds.value.identity_domain_id' infra.json)"
+          export TF_VAR_oci_identity_domain_app_id="$(jq -r '.oci_icds.value.app_id' infra.json)"
+          pushd terraform/flux
+          terraform init -input=false
+          terraform apply -auto-approve
+          popd
+
+      # not necessary, as github-hosted runners are ephemeral and get destroyed
+      # once the job completes. However, keeping this step doesn't hurt. In the
+      # future, if I switch to self-hosted (likely non-ephemeral) runners, this
+      # will be useful
+      - name: Destroy secrets from file system
+        if: always()
+        shell: bash
+        run: shred -u /tmp/lab-install /tmp/lab-ops
+
+      - name: Persist state
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: new-instances
+          path: terraform/oci/state

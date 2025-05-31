@@ -260,3 +260,16 @@ resource "oci_identity_domains_app" "k3s_idp" {
   product_name            = "K3S IdP"
   product_logo_url        = "https://raw.githubusercontent.com/kubernetes/kubernetes/refs/heads/master/logo/logo.svg"
 }
+
+resource "null_resource" "mark_instance_new" {
+  count = length(oci_core_instance.srv_oci_instances)
+  triggers = {
+    instance_id = oci_core_instance.srv_oci_instances[count.index].id
+  }
+  provisioner "local-exec" {
+    command = <<EOF
+    mkdir -p state
+    touch state/${oci_core_instance.srv_oci_instances[count.index].display_name}.new
+    EOF
+  }
+}

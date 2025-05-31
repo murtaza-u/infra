@@ -1,5 +1,6 @@
 formatter:
   type: basic
+  retain_line_breaks_single: true
 exclude:
   - kubernetes/clusters/lab/flux-system
   - secrets.yaml

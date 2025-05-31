@@ -9,6 +9,10 @@ terraform {
       source  = "cloudflare/cloudflare"
       version = "5.5.0"
     }
+    null = {
+      source  = "hashicorp/null"
+      version = "3.2.4"
+    }
   }
   cloud {
     organization = "movingbunker"
@@ -31,3 +35,5 @@ provider "oci" {
 provider "cloudflare" {
   api_token = var.cloudflare_api_token
 }
+
+provider "null" {}

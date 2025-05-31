@@ -13,6 +13,10 @@ terraform {
       source  = "fluxcd/flux"
       version = "1.5.1"
     }
+    null = {
+      source  = "hashicorp/null"
+      version = "3.2.4"
+    }
   }
   cloud {
     organization = "movingbunker"
