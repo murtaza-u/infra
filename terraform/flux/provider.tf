@@ -9,23 +9,15 @@ terraform {
       source  = "hashicorp/http"
       version = "3.5.0"
     }
-    null = {
-      source  = "hashicorp/null"
-      version = "3.2.4"
-    }
-    github = {
-      source  = "integrations/github"
-      version = "6.6.0"
-    }
     flux = {
       source  = "fluxcd/flux"
       version = "1.5.1"
     }
   }
   cloud {
-    organization = "murtaza-u"
+    organization = "movingbunker"
     workspaces {
-      name = "pre"
+      name = "flux"
     }
   }
 }
@@ -36,7 +28,7 @@ provider "oci" {
   region               = var.oci_region
   user_ocid            = var.oci_auth_user_id
   fingerprint          = var.oci_auth_key_fingerprint
-  private_key_path     = var.oci_auth_private_key_file_path
+  private_key          = var.oci_auth_private_key
   private_key_password = var.oci_auth_private_key_password
 }
 
@@ -44,7 +36,7 @@ provider "http" {}
 
 provider "flux" {
   kubernetes = {
-    host     = "https://${oci_core_instance.srv_oci_instances[0].public_ip}:6443"
+    host     = "https://k3s.murtazau.xyz:6443"
     insecure = true
     token    = local.access_token
   }

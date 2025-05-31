@@ -22,9 +22,9 @@ variable "oci_auth_key_fingerprint" {
   description = "Auth public key's fingerprint"
 }
 
-variable "oci_auth_private_key_file_path" {
+variable "oci_auth_private_key" {
   type        = string
-  description = "Auth private key file path"
+  description = "Auth private key"
 }
 
 variable "oci_auth_private_key_password" {
@@ -33,42 +33,14 @@ variable "oci_auth_private_key_password" {
   sensitive   = true
 }
 
-variable "oci_parent_compartment_id" {
+variable "oci_identity_domain_id" {
   type        = string
-  description = "Compartment OCID of the parent compartment"
+  description = "ID of the OCI identity domain"
 }
 
-variable "oci_domain_admin_email" {
+variable "oci_identity_domain_app_id" {
   type        = string
-  description = "Domain administrator's email"
-  sensitive   = true
-}
-
-variable "oci_instance_shape" {
-  type        = string
-  default     = "VM.Standard.A1.Flex"
-  description = "Instance shape"
-}
-
-###########
-## NixOS ##
-###########
-variable "install_ssh_pub_key" {
-  type        = string
-  description = "SSH public key to be added as an authorized key to the instances for nix-install"
-  sensitive   = true
-}
-
-variable "install_ssh_priv_key" {
-  type        = string
-  description = "SSH private key to be used to connect to the instances during nix-install"
-  sensitive   = true
-}
-
-variable "ops_ssh_priv_key" {
-  type        = string
-  description = "SSH private key to be used to connect to the instances during nix-rebuild"
-  sensitive   = true
+  description = "ID of the OCI identity domain app"
 }
 
 ############

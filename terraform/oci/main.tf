@@ -228,11 +228,6 @@ resource "oci_identity_domains_setting" "lab_domain_settings" {
   schemas                    = ["urn:ietf:params:scim:schemas:oracle:idcs:Settings"]
   setting_id                 = "Settings"
   signing_cert_public_access = true
-  custom_branding            = true
-  company_names {
-    locale = "en-US"
-    value  = "MovingBunkerLabs"
-  }
 }
 
 resource "oci_identity_domains_app" "k3s_idp" {
@@ -261,7 +256,6 @@ resource "oci_identity_domains_app" "k3s_idp" {
   is_oauth_client         = true
   login_mechanism         = "OIDC"
   redirect_uris           = ["http://localhost:8000", "http://localhost:18000"]
-  refresh_token_expiry    = 604800
   contact_email_address   = "murtaza@murtazau.xyz"
   product_name            = "K3S IdP"
   product_logo_url        = "https://raw.githubusercontent.com/kubernetes/kubernetes/refs/heads/master/logo/logo.svg"

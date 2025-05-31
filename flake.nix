@@ -16,6 +16,14 @@
       url = "github:nix-community/disko?ref=v1.11.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixos-anywhere = {
+      url = "github:nix-community/nixos-anywhere";
+      inputs = {
+        nixpkgs.follows = "unstable-nixpkgs";
+        nixos-stable.follows = "nixpkgs";
+        disko.follows = "disko";
+      };
+    };
   };
   outputs = { nixpkgs, flake-utils, ... }@inputs:
     let
@@ -53,7 +61,9 @@
               oci-cli
               terraform-ls
               terraform
+              just
               (import ./hack/kubelogin { pkgs = unstable; })
+              inputs.nixos-anywhere.packages.${system}.nixos-anywhere
             ];
           };
         }
