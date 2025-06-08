@@ -136,6 +136,11 @@ jobs:
         uses: cachix/install-nix-action@v31
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
+          extra_nix_config: |
+            extra-platforms = aarch64-linux
+
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v3
 
       - name: Restore and save Nix store
         uses: nix-community/cache-nix-action@v6
@@ -183,11 +188,11 @@ jobs:
 
             # nixos-rebuild
             echo "[*] Existing instance: $host"
-            # just target_host="ops@$ip" ssh_identity_file="/tmp/lab-ops" deploy "$host"
-            # if [[ "$?" != 0 ]]; then
-            #   failed=1
-            #   echo "[!] Rebuild failed: $host"
-            # fi
+            just target_host="ops@$ip" ssh_identity_file="/tmp/lab-ops" switch "$host"
+            if [[ "$?" != 0 ]]; then
+              failed=1
+              echo "[!] Rebuild failed: $host"
+            fi
           done <<< $(jq -r '.oci_instances.value | to_entries[] | "\(.key) \(.value.public_ip)"' infra.json)
 
           echo "success_hosts=${success_hosts[*]}" >> "$GITHUB_OUTPUT"
@@ -222,7 +227,7 @@ jobs:
       - name: Destroy secrets from file system
         if: always()
         shell: bash
-        run: shred -u /tmp/lab-install /tmp/lab-ops
+        run: shred -u /tmp/lab-install /tmp/lab-ops 2>/dev/null
 
       - name: Persist state
         if: always()
