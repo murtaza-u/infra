@@ -1,6 +1,6 @@
 extends: default
 ignore:
-  - clusters/lab/flux-system/
+  - kubernetes/clusters/lab/flux-system/
   - secrets.yaml
 rules:
   line-length:

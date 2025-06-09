@@ -133,11 +133,14 @@ jobs:
           just-version: 1.40.0
 
       - name: Setup nix
-        uses: cachix/install-nix-action@v31
+        uses: nixbuild/nix-quick-install-action@v30
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
-          extra_nix_config: |
+          enable_kvm: true
+          nix_conf: |
             extra-platforms = aarch64-linux
+            keep-env-derivations = true
+            keep-outputs = true
 
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v3
@@ -149,10 +152,6 @@ jobs:
           primary-key: nix-${{ runner.os }}-${{ hashFiles('**/*.nix', '**/flake.lock') }}
           # if there's no cache hit, restore a cache by this prefix
           restore-prefixes-first-match: nix-${{ runner.os }}-
-          # collect garbage until the Nix store size (in bytes) is at most this
-          # number before trying to save a new cache
-          # 1G = 1073741824
-          gc-max-store-size-linux: 8G
 
       - name: Deploy NixOS
         id: deploy

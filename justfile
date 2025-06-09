@@ -5,7 +5,7 @@ default:
     @just -l
 
 build host:
-    nix build .#nixosConfigurations.{{ host }}.config.system.build.toplevel --impure
+    nix build ".#nixosConfigurations.{{ host }}.config.system.build.toplevel" --impure
 
 switch host: (build host)
     export NIX_SSHOPTS="-i {{ ssh_identity_file }} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"; \
