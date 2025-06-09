@@ -152,6 +152,8 @@ jobs:
           primary-key: nix-${{ runner.os }}-${{ hashFiles('**/*.nix', '**/flake.lock') }}
           # if there's no cache hit, restore a cache by this prefix
           restore-prefixes-first-match: nix-${{ runner.os }}-
+          paths: |
+            result
 
       - name: Deploy NixOS
         id: deploy
