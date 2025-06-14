@@ -87,12 +87,6 @@ jobs:
           pushd "terraform/oci"
           terraform plan -no-color
           popd
-
-      - name: Terraform Plan FluxCD
-        run: |
-          pushd "terraform/flux"
-          terraform plan -no-color
-          popd
   deploy:
     runs-on: ubuntu-latest
     defaults:
