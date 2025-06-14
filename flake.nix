@@ -55,6 +55,7 @@
                 ssh-to-age
                 yamlfmt
                 yamllint
+                yaml-language-server
                 kubectl
                 fluxcd
                 kubernetes-helm

@@ -62,3 +62,9 @@ variable "github_token" {
   type        = string
   sensitive   = true
 }
+
+variable "cloudfare_dns_record" {
+  type        = string
+  description = "Cloudflare DNS record"
+  default     = "k3s.murtazau.xyz"
+}

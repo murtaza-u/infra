@@ -70,3 +70,9 @@ variable "cloudfare_zone_id" {
   description = "Cloudflare zone id"
   sensitive   = true
 }
+
+variable "cloudfare_dns_record" {
+  type        = string
+  description = "Cloudflare DNS record"
+  default     = "k3s.murtazau.xyz"
+}

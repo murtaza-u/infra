@@ -23,6 +23,7 @@ env:
   TF_VAR_cloudfare_zone_id: ${{ secrets.CLOUDFARE_ZONE_ID }}
   TF_VAR_github_repository: ${{ github.event.repository.name }}
   TF_VAR_github_token: ${{ secrets.GH_PAT }}
+  TF_VAR_cloudflare_dns_record: ${{ vars.CLOUDFLARE_DNS_RECORD }}
 
 jobs:
   terraform-ci:
@@ -171,6 +172,7 @@ jobs:
 
           success_hosts=()
           failed=0
+          fresh_installs=0
 
           while read -r host ip; do
             # nixos-anywhere
@@ -180,6 +182,7 @@ jobs:
               if [[ "$?" == 0 ]]; then
                 rm terraform/oci/state/${host}.new
                 success_hosts+=("$host")
+                fresh_installs=$((fresh_installs + 1))
               else
                 failed=1
                 echo "[!] Install failed: $host"
@@ -197,6 +200,8 @@ jobs:
           done <<< $(jq -r '.oci_instances.value | to_entries[] | "\(.key) \(.value.public_ip)"' infra.json)
 
           echo "success_hosts=${success_hosts[*]}" >> "$GITHUB_OUTPUT"
+          echo "fresh_installs=${fresh_installs}" >> "$GITHUB_OUTPUT"
+
           if [[ "$failed" == 1 ]]; then
             exit 1
           fi
@@ -211,9 +216,28 @@ jobs:
           git commit -m "feat: add hardware.nix from nixos-anywhere" || echo "No changes to commit"
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:${{ github.ref_name }}
 
+      - name: Wait for DNS resolution
+        env:
+          DOMAIN: ${{ vars.CLOUDFLARE_DNS_RECORD }}
+        run: |
+          for i in {1..30}; do
+            if dig +short "$DOMAIN" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$'; then
+              echo "DNS resolved: $DOMAIN"
+              exit 0
+            fi
+            echo "DNS resolution failed. Retrying in 30s..."
+            sleep 30s
+          done
+          echo "DNS resolution failed. Giving up"
+          exit 1
+
       - name: Provision FluxCD on the cluster
         shell: bash
         run: |
+          if [[ ${{ steps.deploy.outputs.fresh_installs }} -gt 0 ]]; then
+            echo "waiting 5m for the cluster to be up (hack)..."
+            sleep 5m
+          fi
           export TF_VAR_oci_identity_domain_id="$(jq -r '.oci_icds.value.identity_domain_id' infra.json)"
           export TF_VAR_oci_identity_domain_app_id="$(jq -r '.oci_icds.value.app_id' infra.json)"
           pushd terraform/flux

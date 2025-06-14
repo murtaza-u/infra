@@ -40,7 +40,7 @@ provider "http" {}
 
 provider "flux" {
   kubernetes = {
-    host     = "https://k3s.murtazau.xyz:6443"
+    host     = "https://${var.cloudflare_dns_record}:6443"
     insecure = true
     token    = local.access_token
   }
