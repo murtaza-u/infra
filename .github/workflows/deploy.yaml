@@ -28,6 +28,9 @@ env:
 jobs:
   terraform-ci:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
@@ -39,7 +42,6 @@ jobs:
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
       - name: Terraform init
-        shell: bash
         run: |
           for config_path in terraform/*; do
             pushd "$config_path"
@@ -48,7 +50,6 @@ jobs:
           done
 
       - name: Terraform check formatting
-        shell: bash
         continue-on-error: true
         run: |
           for config_path in terraform/*; do
@@ -58,7 +59,6 @@ jobs:
           done
 
       - name: Terraform validate
-        shell: bash
         run: |
           for config_path in terraform/*; do
             pushd "$config_path"
@@ -72,11 +72,9 @@ jobs:
           tflint_version: v0.58.0
 
       - name: Init TFLint
-        shell: bash
         run: tflint --init
 
       - name: Run TFLint
-        shell: bash
         run: |
           for config_path in terraform/*; do
             pushd "$config_path"
@@ -99,6 +97,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   deploy:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     needs:
       - terraform-ci
     if: github.ref_name == 'main'
@@ -120,7 +121,6 @@ jobs:
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
       - name: Provision Oracle Cloud Infrastructure (OCI) resources
-        shell: bash
         run: |
           pushd terraform/oci
           terraform init -input=false
@@ -158,7 +158,6 @@ jobs:
 
       - name: Deploy NixOS
         id: deploy
-        shell: bash
         run: |
           set -uo pipefail
 
@@ -232,7 +231,6 @@ jobs:
           exit 1
 
       - name: Provision FluxCD on the cluster
-        shell: bash
         run: |
           if [[ ${{ steps.deploy.outputs.fresh_installs }} -gt 0 ]]; then
             echo "waiting 5m for the cluster to be up (hack)..."
@@ -251,7 +249,6 @@ jobs:
       # will be useful
       - name: Destroy secrets from file system
         if: always()
-        shell: bash
         run: shred -u /tmp/lab-install /tmp/lab-ops 2>/dev/null
 
       - name: Persist state
