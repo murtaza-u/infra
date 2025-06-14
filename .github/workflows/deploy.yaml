@@ -82,19 +82,17 @@ jobs:
             popd
           done
 
-      - name: Terraform Plan
+      - name: Terraform Plan OCI
         run: |
           pushd "terraform/oci"
-          terraform plan -no-color 2>&1 | tee "${{ github.workspace }}/oci.tfplan"
+          terraform plan -no-color
           popd
 
-      - name: Comment Terraform OCI Plan on PR
-        if: github.event_name == 'pull_request'
-        uses: blinqas/tf-plan-pr-comment@v1
-        with:
-          output_file: ${{ github.workspace }}/oci.tfplan
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Terraform Plan FluxCD
+        run: |
+          pushd "terraform/flux"
+          terraform plan -no-color
+          popd
   deploy:
     runs-on: ubuntu-latest
     defaults:
