@@ -1,5 +1,5 @@
 {
-  description = "Lab on a Shoestring";
+  description = "Infrastructure as Code - Using NixOS + FluxCD";
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
     unstable-nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";

@@ -1,4 +1,4 @@
-{ lib, config, ... }:
+{ pkgs, lib, config, ... }:
 let
   transmissionPort = 9091;
   jellyfinPort = 8096;
@@ -137,6 +137,20 @@ in
                 proxy_set_header X-Forwarded-Host $host;
                 proxy_set_header X-Forwarded-Server $host;
               '';
+            };
+          };
+        };
+        "ariang.${config.media.reverseProxies.domain}" = lib.mkIf config.media.aria2.enable {
+          forceSSL = config.media.reverseProxies.enableTLS;
+          useACMEHost = config.media.reverseProxies.useACMEHost;
+          locations = {
+            "/" = {
+              root = "${pkgs.ariang}/share/ariang";
+              index = "index.html";
+            };
+            "^~ /jsonrpc" = {
+              proxyPass = "http://localhost:${toString config.services.aria2.settings.rpc-listen-port}";
+              recommendedProxySettings = true;
             };
           };
         };

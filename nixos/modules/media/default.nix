@@ -6,5 +6,6 @@
     ./jellyseerr.nix
     ./nginx.nix
     ./syncthing.nix
+    ./aria2.nix
   ];
 }

@@ -64,6 +64,10 @@
         owner = config.services.nginx.user;
         group = config.services.nginx.group;
       };
+      "aria2_rpc_token" = {
+        mode = "0400";
+        owner = "aria2";
+      };
     };
     templates = {
       "transmission/settings.json" = {
@@ -100,6 +104,7 @@
     jellyseerr.enable = true;
     jellyfin.enable = true;
     syncthing.enable = true;
+    aria2.enable = true;
     reverseProxies = {
       enable = true;
       domain = "home.murtazau.xyz";
