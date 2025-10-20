@@ -1,17 +1,17 @@
 terraform {
-  required_version = "~> 1.12"
+  required_version = "~> 1.0"
   required_providers {
     oci = {
       source  = "oracle/oci"
-      version = "7.2.0"
+      version = "~> 7.0"
     }
     cloudflare = {
       source  = "cloudflare/cloudflare"
-      version = "5.5.0"
+      version = "~> 5.0"
     }
     null = {
       source  = "hashicorp/null"
-      version = "3.2.4"
+      version = "~> 3.0"
     }
   }
   cloud {
