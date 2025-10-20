@@ -13,9 +13,9 @@ jobs:
       pull-requests: write
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: tfsec
-        uses: aquasecurity/tfsec-pr-commenter-action@v1.2.0
+        uses: aquasecurity/tfsec-pr-commenter-action@v1
         with:
           github_token: ${{ github.token }}
           soft_fail_commenter: true
