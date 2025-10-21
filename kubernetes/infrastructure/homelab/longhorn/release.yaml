@@ -1,0 +1,90 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/refs/heads/main/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: longhorn
+  namespace: longhorn-system
+spec:
+  chart:
+    spec:
+      chart: longhorn
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: longhorn
+      version: v1.10.x
+  interval: 1m
+  install:
+    crds: Create
+  upgrade:
+    crds: CreateReplace
+  values:
+    networkPolicies:
+      # Setting that allows you to enable network policies that control access
+      # to Longhorn pods.
+      enabled: true
+      # Distribution that determines the policy for allowing access for an
+      # ingress. (Options: "k3s", "rke2", "rke1")
+      type: "k3s"
+    persistence:
+      # Setting that allows you to specify the default Longhorn StorageClass.
+      defaultClass: true
+      # Filesystem type of the default Longhorn StorageClass.
+      defaultFsType: ext4
+      # mkfs parameters of the default Longhorn StorageClass.
+      defaultMkfsParams: ""
+      # Replica count of the default Longhorn StorageClass.
+      defaultClassReplicaCount: 1
+      # Data locality of the default Longhorn StorageClass.
+      # (Options: "disabled", "best-effort")
+      defaultDataLocality: disabled
+      # Reclaim policy that provides instructions for handling of a volume
+      # after its claim is released. (Options: "Retain", "Delete")
+      reclaimPolicy: Delete
+      # VolumeBindingMode controls when volume binding and dynamic
+      # provisioning should occur.
+      # (Options: "Immediate", "WaitForFirstConsumer")
+      # (Defaults to "Immediate")
+      volumeBindingMode: "Immediate"
+      # Setting that allows you to enable live migration of a Longhorn volume
+      # from one node to another.
+      migratable: false
+    csi:
+      # Replica count of the CSI Attacher. When unspecified, Longhorn uses the
+      # default value ("3").
+      attacherReplicaCount: 1
+      # Replica count of the CSI Provisioner. When unspecified, Longhorn uses
+      # the default value ("3").
+      provisionerReplicaCount: 1
+      # Replica count of the CSI Resizer. When unspecified, Longhorn uses the
+      # default value ("3").
+      resizerReplicaCount: 1
+      # Replica count of the CSI Snapshotter. When unspecified, Longhorn uses
+      # the default value ("3").
+      snapshotterReplicaCount: 1
+    longhornUI:
+      # Replica count for Longhorn UI.
+      replicas: 1
+    metrics:
+      serviceMonitor:
+        # Setting that allows the creation of a Prometheus ServiceMonitor
+        # resource for Longhorn Manager components.
+        enabled: false
+        # Additional labels for the Prometheus ServiceMonitor resource.
+        additionalLabels:
+          release: monitoring-kube-prometheus-stack
+        # Annotations for the Prometheus ServiceMonitor resource.
+        annotations: {}
+        # Interval at which Prometheus scrapes the metrics from the target.
+        interval: ""
+        # Timeout after which Prometheus considers the scrape to be failed.
+        scrapeTimeout: ""
+        # Configures the relabeling rules to apply the target’s metadata labels.
+        # See the [Prometheus Operator documentation](https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.Endpoint)
+        # for formatting details.
+        relabelings: []
+        # Configures the relabeling rules to apply to the samples before
+        # ingestion.
+        # See the [Prometheus Operator documentation](https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.Endpoint)
+        # for formatting details.
+        metricRelabelings: []

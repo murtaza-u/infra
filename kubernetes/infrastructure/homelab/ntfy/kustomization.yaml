@@ -1,0 +1,51 @@
+# yaml-language-server: $schema=https://www.schemastore.org/kustomization.json
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base/ntfy
+  - ingress.yaml
+  - servicemonitor.yaml
+  - ntfy-users-sealed.yaml
+  - alertfy
+configMapGenerator:
+  - name: ntfy
+    files:
+      - server.yml
+namespace: ntfy
+images:
+  - name: binwiederhier/ntfy
+    newTag: v2.14
+patches:
+  - target:
+      group: apps
+      version: v1
+      kind: StatefulSet
+      name: ntfy
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/resources
+        value:
+          requests:
+            cpu: 10m
+            memory: 25Mi
+          limits:
+            cpu: 10m
+            memory: 50Mi
+      - op: add
+        path: /spec/template/spec/containers/0/ports/1
+        value:
+          containerPort: 9090
+          name: metrics
+  - target:
+      group: ""
+      version: v1
+      kind: Service
+      name: ntfy
+    patch: |-
+      - op: add
+        path: /spec/ports/1
+        value:
+          name: metrics
+          protocol: TCP
+          port: 9090
+          targetPort: metrics

@@ -1,7 +1,6 @@
----
 creation_rules:
   - path_regex: ^secrets.yaml$
     key_groups:
       - age:
-          - age1q0mwgq0yhwykr4u2zsy8khy7zxjne02ed9spwfa8gpqv5kfddcyq4vm7ld # murtaza
-          - age132a8fc6kvykvptnahl8enxc0xue0qa0gv6nw3nln27lu8tspcfusyy776e # scout
+          - age1v2p6sy6p82r93ft4zpfv8qwqz29pf73vglk44t3ge3jtwsqcz4fqj33en7 # ops
+          - age14ucjne9933qermmvns6s7cfxvd9t90j7p7985f79hkerdna83feqqzr2ek # murtaza

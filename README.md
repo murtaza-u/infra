@@ -1,1 +1,3 @@
-# Homelab on a Shoestring
+# 🏡 My Homelab Setup
+
+*This project is a WIP*

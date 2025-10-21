@@ -1,0 +1,45 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/refs/heads/main/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: sealed-secrets
+  namespace: sealed-secrets
+spec:
+  chart:
+    spec:
+      chart: sealed-secrets
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: sealed-secrets
+      version: 2.x.x
+  install:
+    crds: Create
+  interval: 1m
+  upgrade:
+    crds: CreateReplace
+  values:
+    # Specifies key renewal period. e.g "720h30m"
+    #
+    # Default 30 days
+    #
+    # To disable use "0", with quotes!
+    keyrenewperiod: ""
+    resources:
+      requests:
+        cpu: 50m
+        memory: 25Mi
+      limits:
+        cpu: 100m
+        memory: 50Mi
+    metrics:
+      dashboards:
+        create: true
+        labels:
+          grafana_dashboard: "1"
+        namespace: sealed-secrets
+      serviceMonitor:
+        enabled: true
+        labels:
+          release: monitoring-kube-prometheus-stack
+        namespace: sealed-secrets

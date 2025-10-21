@@ -1,0 +1,52 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/refs/heads/main/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: alertfy
+  namespace: ntfy
+spec:
+  chart:
+    spec:
+      chart: ./helm
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: GitRepository
+        name: alertfy
+  interval: 1m
+  values:
+    replicaCount: 1
+    resources:
+      requests:
+        memory: 15Mi
+        cpu: 10m
+      limits:
+        memory: 30Mi
+        cpu: 10m
+    envSecretName: alertfy
+    config:
+      hook:
+        auth:
+          enable: false
+        log:
+          level: "info" # possible values: "debug", "info", "warn", "error"
+          format: "json" # possible values: "text", "json"
+        terminationGracePeriod: 0
+      ntfy:
+        baseUrl: "https://ntfy.murtazau.xyz"
+        auth:
+          enable: true
+        notification:
+          topic: "alertmanager"
+          priority: |
+            Status == "firing" ? "urgent" : "default"
+          tags:
+            - tag: "rotating_light,construction"
+              condition: |
+                Status == "firing"
+            - tag: "white_check_mark,confetti_ball"
+              condition: |
+                Status == "resolved"
+          title: |
+            {{ if eq .Status "resolved" }}Resolved: {{ end }}{{ index .Annotations "summary" }}
+          description: |-
+            {{ index .Annotations "description" }}

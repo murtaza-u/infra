@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ntfy
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: ntfy
+  namespace: ntfy
+spec:
+  dependsOn:
+    - name: sealed-secrets
+      namespace: sealed-secrets
+    - name: longhorn
+      namespace: longhorn-system
+    - name: monitoring
+      namespace: monitoring
+  interval: 1m
+  path: ./kubernetes/infrastructure/homelab/ntfy
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: ntfy

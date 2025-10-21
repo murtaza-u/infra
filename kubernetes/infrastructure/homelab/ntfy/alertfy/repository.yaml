@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/refs/heads/main/source.toolkit.fluxcd.io/gitrepository_v1.json
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: alertfy
+  namespace: ntfy
+spec:
+  interval: 1m
+  ref:
+    semver: '>=0.2.0'
+  url: https://github.com/murtaza-u/alertfy
