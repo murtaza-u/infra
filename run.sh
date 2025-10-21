@@ -176,6 +176,22 @@ oci_setup() {
     info "Terraform User OCID: ${user_ocid}"
 }
 
+comp() {
+    local arg="$1"; shift
+    for c in "$@"; do
+        [[ "${c:0:${#arg}}" == "${arg,,}" ]] && echo "$c"
+    done
+}
+
+subcommands=(build switch install oci-setup)
+if [[ -n "${COMP_LINE:-}" ]]; then
+    if [[ "$1" == "$3" ]]; then
+        comp "$2" "${subcommands[@]}"
+        exit 0
+    fi
+    exit 0
+fi
+
 if [[ "$#" -lt 1 ]]; then
     usage
 fi
