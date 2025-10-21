@@ -6,13 +6,13 @@ locals {
   access_token  = jsondecode(data.http.oidc_token.response_body).access_token
 }
 
-data "oci_identity_domain" "lab" {
+data "oci_identity_domain" "homelab" {
   domain_id = var.oci_identity_domain_id
 }
 
 data "oci_identity_domains_app" "k3s_idp" {
   app_id        = var.oci_identity_domain_app_id
-  idcs_endpoint = data.oci_identity_domain.lab.url
+  idcs_endpoint = data.oci_identity_domain.homelab.url
 }
 
 data "http" "oidc_token" {

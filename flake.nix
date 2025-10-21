@@ -1,5 +1,5 @@
 {
-  description = "Infrastructure as Code - Using NixOS + FluxCD";
+  description = "Self-hosted adventures, experiments, fun.";
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
     unstable-nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -66,6 +66,7 @@
                 terraform
                 just
                 jq
+                openssl
                 inputs.nixos-anywhere.packages.${system}.nixos-anywhere
                 (import ./hack/kubelogin { pkgs = unstable; })
               ];
@@ -77,6 +78,11 @@
     {
       nixosConfigurations = {
         srv-oci-0 = mkSystem "srv-oci-0" rec {
+          system = "aarch64-linux";
+          pkgs = import nixpkgs { inherit system; };
+          unstable = import inputs.unstable-nixpkgs { inherit system; };
+        };
+        srv-oci-1 = mkSystem "srv-oci-1" rec {
           system = "aarch64-linux";
           pkgs = import nixpkgs { inherit system; };
           unstable = import inputs.unstable-nixpkgs { inherit system; };

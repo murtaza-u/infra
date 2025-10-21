@@ -1,13 +1,12 @@
-resource "oci_identity_compartment" "lab" {
+data "oci_identity_compartments" "homelab" {
   compartment_id = var.oci_parent_compartment_id
-  description    = "Lab environment"
-  name           = "lab"
+  name           = "homelab"
 }
 
-resource "oci_identity_domain" "lab" {
-  compartment_id            = oci_identity_compartment.lab.id
-  description               = "Lab domain"
-  display_name              = "Lab"
+resource "oci_identity_domain" "homelab" {
+  compartment_id            = data.oci_identity_compartments.homelab.compartments[0].id
+  description               = "homelab domain"
+  display_name              = "homelab"
   home_region               = var.oci_region
   license_type              = "free"
   admin_email               = var.oci_domain_admin_email
@@ -19,35 +18,35 @@ resource "oci_identity_domain" "lab" {
   is_notification_bypassed  = false
 }
 
-resource "oci_identity_policy" "lab_compartment_administrator_policy" {
-  compartment_id = oci_identity_compartment.lab.id
-  description    = "Allow Lab domain administrators to manage all resources in the Lab compartment"
-  name           = "lab_compartment_administrator_policy"
+resource "oci_identity_policy" "homelab_compartment_administrator_policy" {
+  compartment_id = data.oci_identity_compartments.homelab.compartments[0].id
+  description    = "Allow homelab domain administrators to manage all resources in the homelab compartment"
+  name           = "homelab_compartment_administrator_policy"
   statements = [
-    "Allow group '${oci_identity_domain.lab.display_name}'/'Domain_Administrators' to manage all-resources in compartment ${oci_identity_compartment.lab.name}"
+    "Allow group '${data.oci_identity_compartments.homelab.compartments[0].name}'/'Domain_Administrators' to manage all-resources in compartment ${data.oci_identity_compartments.homelab.compartments[0].name}"
   ]
 }
 
-resource "oci_core_vcn" "movingbunkerlab" {
-  compartment_id = oci_identity_compartment.lab.id
+resource "oci_core_vcn" "movingbunkerhomelab" {
+  compartment_id = data.oci_identity_compartments.homelab.compartments[0].id
   cidr_block     = "10.0.0.0/16"
-  display_name   = "MovingBunkerLab"
+  display_name   = "MovingBunkerhomelab"
   is_ipv6enabled = false
 }
 
-resource "oci_core_internet_gateway" "movingbunkerlab_kubernetes_cluster" {
-  compartment_id = oci_identity_compartment.lab.id
-  vcn_id         = oci_core_vcn.movingbunkerlab.id
+resource "oci_core_internet_gateway" "movingbunkerhomelab_kubernetes_cluster" {
+  compartment_id = data.oci_identity_compartments.homelab.compartments[0].id
+  vcn_id         = oci_core_vcn.movingbunkerhomelab.id
   enabled        = true
   display_name   = "KubernetesClusterIGW"
 }
 
-resource "oci_core_route_table" "movingbunkerlab_kubernetes_cluster" {
-  compartment_id = oci_identity_compartment.lab.id
-  vcn_id         = oci_core_vcn.movingbunkerlab.id
+resource "oci_core_route_table" "movingbunkerhomelab_kubernetes_cluster" {
+  compartment_id = data.oci_identity_compartments.homelab.compartments[0].id
+  vcn_id         = oci_core_vcn.movingbunkerhomelab.id
   display_name   = "KubernetesCluster"
   route_rules {
-    network_entity_id = oci_core_internet_gateway.movingbunkerlab_kubernetes_cluster.id
+    network_entity_id = oci_core_internet_gateway.movingbunkerhomelab_kubernetes_cluster.id
     description       = "Connect to the internet"
     destination       = "0.0.0.0/0"
     destination_type  = "CIDR_BLOCK"
@@ -55,8 +54,8 @@ resource "oci_core_route_table" "movingbunkerlab_kubernetes_cluster" {
 }
 
 resource "oci_core_security_list" "kubernetes_cluster" {
-  compartment_id = oci_identity_compartment.lab.id
-  vcn_id         = oci_core_vcn.movingbunkerlab.id
+  compartment_id = data.oci_identity_compartments.homelab.compartments[0].id
+  vcn_id         = oci_core_vcn.movingbunkerhomelab.id
   display_name   = "Allow http, https & ssh inbound and ALL outbound"
   egress_security_rules {
     description = "Allow all traffic"
@@ -93,14 +92,14 @@ resource "oci_core_security_list" "kubernetes_cluster" {
 }
 
 data "oci_identity_availability_domains" "kubernetes_cluster" {
-  compartment_id = oci_identity_compartment.lab.id
+  compartment_id = data.oci_identity_compartments.homelab.compartments[0].id
 }
 
 resource "oci_core_subnet" "kubernetes_cluster" {
   cidr_block                 = "10.0.0.0/24"
-  compartment_id             = oci_identity_compartment.lab.id
-  vcn_id                     = oci_core_vcn.movingbunkerlab.id
-  route_table_id             = oci_core_route_table.movingbunkerlab_kubernetes_cluster.id
+  compartment_id             = data.oci_identity_compartments.homelab.compartments[0].id
+  vcn_id                     = oci_core_vcn.movingbunkerhomelab.id
+  route_table_id             = oci_core_route_table.movingbunkerhomelab_kubernetes_cluster.id
   display_name               = "KubernetesCluster"
   prohibit_internet_ingress  = false
   prohibit_public_ip_on_vnic = false
@@ -112,20 +111,20 @@ resource "oci_core_subnet" "kubernetes_cluster" {
 ## NSGs ##
 ##########
 resource "oci_core_network_security_group" "k3s_node" {
-  compartment_id = oci_identity_compartment.lab.id
-  vcn_id         = oci_core_vcn.movingbunkerlab.id
+  compartment_id = data.oci_identity_compartments.homelab.compartments[0].id
+  vcn_id         = oci_core_vcn.movingbunkerhomelab.id
   display_name   = "All K3S node"
 }
 
 resource "oci_core_network_security_group" "k3s_server_node" {
-  compartment_id = oci_identity_compartment.lab.id
-  vcn_id         = oci_core_vcn.movingbunkerlab.id
+  compartment_id = data.oci_identity_compartments.homelab.compartments[0].id
+  vcn_id         = oci_core_vcn.movingbunkerhomelab.id
   display_name   = "K3S server node"
 }
 
 resource "oci_core_network_security_group" "k3s_agent_node" {
-  compartment_id = oci_identity_compartment.lab.id
-  vcn_id         = oci_core_vcn.movingbunkerlab.id
+  compartment_id = data.oci_identity_compartments.homelab.compartments[0].id
+  vcn_id         = oci_core_vcn.movingbunkerhomelab.id
   display_name   = "K3S agent node"
 }
 
@@ -175,7 +174,7 @@ resource "oci_core_network_security_group_security_rule" "flannel_cni_vxlan" {
 }
 
 data "oci_core_images" "oracle_linux" {
-  compartment_id   = oci_identity_compartment.lab.id
+  compartment_id   = data.oci_identity_compartments.homelab.compartments[0].id
   operating_system = "Oracle Linux"
   shape            = var.oci_instance_shape
   sort_by          = "TIMECREATED"
@@ -183,8 +182,8 @@ data "oci_core_images" "oracle_linux" {
 }
 
 resource "oci_core_instance" "srv_oci_instances" {
-  count               = 1
-  compartment_id      = oci_identity_compartment.lab.id
+  count               = 2
+  compartment_id      = data.oci_identity_compartments.homelab.compartments[0].id
   availability_domain = oci_core_subnet.kubernetes_cluster.availability_domain
   shape               = var.oci_instance_shape
   shape_config {
@@ -222,8 +221,8 @@ resource "oci_core_instance" "srv_oci_instances" {
   }
 }
 
-resource "oci_identity_domains_setting" "lab_domain_settings" {
-  idcs_endpoint              = oci_identity_domain.lab.url
+resource "oci_identity_domains_setting" "homelab_domain_settings" {
+  idcs_endpoint              = oci_identity_domain.homelab.url
   csr_access                 = "none"
   schemas                    = ["urn:ietf:params:scim:schemas:oracle:idcs:Settings"]
   setting_id                 = "Settings"
@@ -236,7 +235,7 @@ resource "oci_identity_domains_app" "k3s_idp" {
     well_known_id = "CustomWebAppTemplateId"
   }
   display_name  = "K3S IdP"
-  idcs_endpoint = oci_identity_domain.lab.url
+  idcs_endpoint = oci_identity_domain.homelab.url
   schemas = [
     "urn:ietf:params:scim:schemas:oracle:idcs:App",
     "urn:ietf:params:scim:schemas:oracle:idcs:extension:OCITags"

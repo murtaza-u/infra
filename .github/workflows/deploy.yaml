@@ -120,11 +120,6 @@ jobs:
           terraform output -json > ../../infra.json
           popd
 
-      - name: Setup just
-        uses: extractions/setup-just@v3
-        with:
-          just-version: 1.43.0
-
       - name: Setup nix
         uses: nixbuild/nix-quick-install-action@v34
         with:
@@ -169,7 +164,7 @@ jobs:
             # nixos-anywhere
             if [[ -f "terraform/oci/state/${host}.new" ]]; then
               echo "[+] Detected new instance: $host"
-              just target_host="opc@$ip" ssh_identity_file="/tmp/lab-install" install "$host"
+              ./run.sh install "$host" "opc@$ip" /tmp/lab-install
               if [[ "$?" == 0 ]]; then
                 rm terraform/oci/state/${host}.new
                 success_hosts+=("$host")
@@ -183,7 +178,7 @@ jobs:
 
             # nixos-rebuild
             echo "[*] Existing instance: $host"
-            just target_host="ops@$ip" ssh_identity_file="/tmp/lab-ops" switch "$host"
+            ./run.sh switch "$host" "ops@$ip" /tmp/lab-ops
             if [[ "$?" != 0 ]]; then
               failed=1
               echo "[!] Rebuild failed: $host"

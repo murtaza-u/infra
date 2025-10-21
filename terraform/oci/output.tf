@@ -10,7 +10,7 @@ output "oci_instances" {
 
 output "oci_icds" {
   value = {
-    identity_domain_id = oci_identity_domain.lab.id
+    identity_domain_id = oci_identity_domain.homelab.id
     app_id             = oci_identity_domains_app.k3s_idp.id
     oidc_issuer_url    = "https://identity.oraclecloud.com/"
     oidc_discovery_url = "${oci_identity_domains_app.k3s_idp.idcs_endpoint}/.well-known/openid-configuration"

@@ -17,7 +17,7 @@ in
 
   networking = {
     # Set hostname.
-    hostName = "srv-oci-0";
+    hostName = "srv-oci-1";
     # Use firewall provided by the underlying cloud provider's infrastructure.
     firewall.enable = false;
   };
@@ -48,28 +48,8 @@ in
     k3s = {
       enable = true;
       package = extraArgs.unstable.k3s_1_34;
-      role = "server";
-      nodeIP = infra.oci_instances.value."srv-oci-0".private_ip;
-      oidcIssuerURL = infra.oci_icds.value.oidc_issuer_url;
-      oidcDiscoveryURL = infra.oci_icds.value.oidc_discovery_url;
-      oidcClientID = infra.oci_icds.value.oidc_client_id;
-      oidcAudiences = [
-        infra.oci_icds.value.oidc_issuer_url
-        (lib.removeSuffix ":443/.well-known/openid-configuration" infra.oci_icds.value.oidc_discovery_url)
-      ];
-      oidcExtraScope = [ "get_groups" ];
-      oidcGroupsClaimExpression = ''has(claims.groups) ? dyn(claims.groups).map(g, "oci:" + g.name) : []'';
-      oidcUsernameClaimExpression = ''"oci:" + claims.sub'';
-      oidcAdminSubjects = [
-        {
-          kind = "Group";
-          name = "oci:Domain_Administrators";
-        }
-        {
-          kind = "User";
-          name = "oci:${infra.oci_icds.value.oidc_client_id}";
-        }
-      ];
+      role = "agent";
+      nodeIP = infra.oci_instances.value."srv-oci-1".private_ip;
     };
   };
 

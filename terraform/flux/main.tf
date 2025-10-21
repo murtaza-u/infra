@@ -51,7 +51,7 @@ resource "null_resource" "wait_for_k3s" {
   }
 }
 
-resource "flux_bootstrap_git" "lab" {
+resource "flux_bootstrap_git" "homelab" {
   depends_on = [null_resource.wait_for_k3s]
   components_extra = [
     "image-reflector-controller",
@@ -65,5 +65,5 @@ resource "flux_bootstrap_git" "lab" {
   # keep the namespace after uninstalling Flux components.
   keep_namespace = false
   namespace      = "flux-system"
-  path           = "kubernetes/clusters/lab"
+  path           = "kubernetes/clusters/homelab"
 }
