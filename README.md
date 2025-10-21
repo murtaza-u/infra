@@ -1,3 +1,3 @@
-# Infrastructure as Code - Using NixOS + FluxCD
+# 🏡 My Homelab Setup
 
-*This README is a WIP*
+*This project is a WIP*
