@@ -1,0 +1,11 @@
+{
+  imports = [
+    ./transmission.nix
+    ./arr.nix
+    ./jellyfin.nix
+    ./jellyseerr.nix
+    ./nginx.nix
+    ./syncthing.nix
+    ./aria2.nix
+  ];
+}

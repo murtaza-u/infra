@@ -1,74 +1,102 @@
 {
-  description = "Lab on a Shoestring";
+  description = "Self-hosted adventures, experiments, fun.";
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
+    unstable-nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    flake-registry = {
+      url = "github:nixos/flake-registry";
+      flake = false;
+    };
+    flake-utils.url = "github:numtide/flake-utils";
     sops-nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    disko = {
+      url = "github:nix-community/disko?ref=v1.11.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nixos-anywhere = {
+      url = "github:nix-community/nixos-anywhere";
+      inputs = {
+        nixpkgs.follows = "unstable-nixpkgs";
+        nixos-stable.follows = "nixpkgs";
+        disko.follows = "disko";
+      };
+    };
   };
-  outputs = { nixpkgs, sops-nix, ... }:
+  outputs = { nixpkgs, flake-utils, ... }@inputs:
     let
-      system = "x86_64-linux";
-      pkgs = import nixpkgs {
-        inherit system;
-        config = {
-          allowUnfreePredicate = pkg: builtins.elem (pkgs.lib.getName pkg) [
-            "terraform"
-          ];
-          permittedInsecurePackages = [
-            "dotnet-sdk-6.0.428"
-            "aspnetcore-runtime-6.0.36"
-          ];
-        };
+      mkSystem = import ./nixos/lib/mksystem.nix {
+        inherit nixpkgs inputs;
       };
     in
+    flake-utils.lib.eachDefaultSystem
+      (system:
+        let
+          pkgs = import nixpkgs { inherit system; };
+          unstable = import inputs.unstable-nixpkgs {
+            inherit system;
+            config.allowUnfreePredicate = p: builtins.elem (pkgs.lib.getName p) [
+              "terraform"
+            ];
+          };
+        in
+        {
+          formatter = pkgs.nixpkgs-fmt;
+          devShells = {
+            default = pkgs.mkShell {
+              packages = with unstable; [
+                nixd
+                nixpkgs-fmt
+                tflint
+                tfsec
+                sops
+                ssh-to-age
+                yamlfmt
+                yamllint
+                yaml-language-server
+                kubectl
+                fluxcd
+                kubernetes-helm
+                kustomize
+                kubeseal
+                oci-cli
+                terraform-ls
+                terraform
+                just
+                jq
+                openssl
+                inputs.nixos-anywhere.packages.${system}.nixos-anywhere
+                (import ./hack/kubelogin { pkgs = unstable; })
+              ];
+            };
+          };
+        }
+      )
+    //
     {
-      formatter.${system} = pkgs.nixpkgs-fmt;
       nixosConfigurations = {
-        srv-cloud-0 = nixpkgs.lib.nixosSystem {
+        srv-oci-0 = mkSystem "srv-oci-0" rec {
           system = "aarch64-linux";
-          pkgs = import nixpkgs { system = "aarch64-linux"; };
-          modules = [
-            {
-              nix.registry.nixpkgs.flake = nixpkgs;
-              system.stateVersion = "24.11";
-            }
-            ./hosts/srv-cloud-0
-            ./modules
-            sops-nix.nixosModules.sops
-          ];
+          pkgs = import nixpkgs { inherit system; };
+          unstable = import inputs.unstable-nixpkgs { inherit system; };
         };
-        srv-onprem-0 = nixpkgs.lib.nixosSystem {
+        srv-oci-1 = mkSystem "srv-oci-1" rec {
+          system = "aarch64-linux";
+          pkgs = import nixpkgs { inherit system; };
+          unstable = import inputs.unstable-nixpkgs { inherit system; };
+        };
+        srv-onprem-0 = mkSystem "srv-onprem-0" rec {
           system = "x86_64-linux";
-          inherit pkgs;
-          modules = [
-            {
-              nix.registry.nixpkgs.flake = nixpkgs;
-              system.stateVersion = "24.11";
-            }
-            ./hosts/srv-onprem-0
-            ./modules
-            sops-nix.nixosModules.sops
-          ];
+          pkgs = import nixpkgs {
+            inherit system;
+            config.permittedInsecurePackages = [
+              "dotnet-sdk-6.0.428"
+              "aspnetcore-runtime-6.0.36"
+            ];
+          };
         };
-      };
-      devShells.${system}.default = pkgs.mkShell {
-        packages = with pkgs; [
-          nixd
-          nixpkgs-fmt
-          terraform
-          terraform-ls
-          sops
-          ssh-to-age
-          yamlfmt
-          yamllint
-          kubectl
-          fluxcd
-          kubernetes-helm
-          kustomize
-          kubeseal
-        ];
       };
     };
 }
