@@ -49,6 +49,7 @@ in
       enable = true;
       package = extraArgs.unstable.k3s_1_34;
       role = "server";
+      isBootstrapNode = true;
       nodeIP = infra.oci_instances.value."srv-oci-0".private_ip;
       oidcIssuerURL = infra.oci_icds.value.oidc_issuer_url;
       oidcDiscoveryURL = infra.oci_icds.value.oidc_discovery_url;

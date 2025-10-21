@@ -149,22 +149,28 @@ jobs:
           set -uo pipefail
 
           # setup ssh keys
-          echo "${{ secrets.SSH_IDENTITY_FILE_INSTALL }}" > /tmp/lab-install
-          echo "${{ secrets.SSH_IDENTITY_FILE_OPS }}" > /tmp/lab-ops
-          chmod 600 /tmp/lab-install /tmp/lab-ops
+          echo "${{ secrets.SSH_IDENTITY_FILE_INSTALL }}" > /tmp/homelab-install
+          echo "${{ secrets.SSH_IDENTITY_FILE_OPS }}" > /tmp/homelab-ops
+          chmod 600 /tmp/homelab-install /tmp/homelab-ops
 
-          export SSH_HOST_KEY=$(</tmp/lab-ops)
+          export SSH_HOST_KEY=$(</tmp/homelab-ops)
           export TF_OUTPUT_JSON="$PWD/infra.json"
 
           success_hosts=()
           failed=0
           fresh_installs=0
 
-          while read -r host ip; do
+          mapfile -t hosts < <(jq -r '.oci_instances.value | to_entries[] | "\(.key) \(.value.public_ip)"' "$TF_OUTPUT_JSON")
+
+          for entry in "${hosts[@]}"; do
+            host="${entry%% *}"
+            ip="${entry##* }"
+            echo "[*] Processing host: $host ($ip)"
+
             # nixos-anywhere
             if [[ -f "terraform/oci/state/${host}.new" ]]; then
               echo "[+] Detected new instance: $host"
-              ./run.sh install "$host" "opc@$ip" /tmp/lab-install
+              ./run.sh install "$host" "opc@$ip" /tmp/homelab-install
               if [[ "$?" == 0 ]]; then
                 rm terraform/oci/state/${host}.new
                 success_hosts+=("$host")
@@ -177,13 +183,13 @@ jobs:
             fi
 
             # nixos-rebuild
-            echo "[*] Existing instance: $host"
-            ./run.sh switch "$host" "ops@$ip" /tmp/lab-ops
+            echo "[+] Existing instance: $host"
+            ./run.sh switch "$host" "ops@$ip" /tmp/homelab-ops
             if [[ "$?" != 0 ]]; then
               failed=1
               echo "[!] Rebuild failed: $host"
             fi
-          done <<< $(jq -r '.oci_instances.value | to_entries[] | "\(.key) \(.value.public_ip)"' infra.json)
+          done
 
           echo "success_hosts=${success_hosts[*]}" >> "$GITHUB_OUTPUT"
           echo "fresh_installs=${fresh_installs}" >> "$GITHUB_OUTPUT"
@@ -236,7 +242,7 @@ jobs:
       # will be useful
       - name: Destroy secrets from file system
         if: always()
-        run: shred -u /tmp/lab-install /tmp/lab-ops 2>/dev/null
+        run: shred -u /tmp/homelab-install /tmp/homelab-ops 2>/dev/null
 
       - name: Persist state
         if: always()

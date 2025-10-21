@@ -21,6 +21,7 @@ usage() {
     echo "  $0 switch <host> <target_host> <ssh_identity_file>"
     echo "  $0 install <host> <target_host> <ssh_identity_file>"
     echo "  $0 oci-setup <parent_compartment_ocid> <public_key_file>"
+    exit 1
 }
 
 build() {
@@ -32,6 +33,8 @@ switch() {
     local host="$1"
     local target_host="$2"
     local ssh_identity_file="$3"
+
+    build "$host"
 
     export NIX_SSHOPTS="-i ${ssh_identity_file} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
     nix-copy-closure --to "${target_host}" "$(readlink -f ./result)"
@@ -47,7 +50,7 @@ install() {
     local ssh_identity_file="$3"
 
     nix run nixpkgs#nixos-anywhere -- \
-        --generate-hardware-config "nixos-generate-config nixos/hosts/${host}/hardware.nix" \
+        --generate-hardware-config nixos-generate-config "nixos/hosts/${host}/hardware.nix" \
         --flake ".#${host}" \
         --target-host "${target_host}" \
         -i "${ssh_identity_file}" \
@@ -175,7 +178,6 @@ oci_setup() {
 
 if [[ "$#" -lt 1 ]]; then
     usage
-    exit 1
 fi
 
 cmd="${1}"; shift
@@ -185,5 +187,5 @@ case "$cmd" in
     switch)    switch "$@" ;;
     install)   install "$@" ;;
     oci-setup) oci_setup "$@" ;;
-    *)         usage && exit 1 ;;
+    *)         usage ;;
 esac

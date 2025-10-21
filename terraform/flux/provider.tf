@@ -52,6 +52,6 @@ provider "flux" {
     }
     author_email = "bot@fluxcd.io"
     author_name  = "Flux Bot"
-    branch       = "main"
+    branch       = "refactor/nixos-and-gh-action-pipeline"
   }
 }

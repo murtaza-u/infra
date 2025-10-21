@@ -50,6 +50,14 @@ in
           "agent"
         ];
       };
+      isBootstrapNode = lib.mkOption {
+        type = lib.types.bool;
+        description = ''
+          Node will be responsible to bootstrap k3s control-plane.
+          Node's `role` must be `server`.
+        '';
+        default = false;
+      };
       nodeIP = lib.mkOption {
         type = lib.types.nullOr lib.types.str;
         description = "IPv4/IPv6 addresses to advertise for node.";
@@ -133,10 +141,14 @@ in
   };
   config = lib.mkIf config.platform.k3s.enable {
     assertions = [
-      {
-        assertion = isServer && lib.length config.platform.k3s.oidcAdminSubjects != 0;
-        message = "platform.k3s.oidcAdminSubjects must not be empty for server node";
-      }
+      (lib.mkIf (!isServer) {
+        assertion = !config.platform.k3s.isBootstrapNode;
+        message = "Only server nodes can be responsible for bootstrapping";
+      })
+      (lib.mkIf (isServer && config.platform.k3s.isBootstrapNode) {
+        assertion = lib.length config.platform.k3s.oidcAdminSubjects != 0;
+        message = "platform.k3s.oidcAdminSubjects must not be empty for bootstrap node";
+      })
     ];
     environment.etc = lib.mkIf isServer {
       "k3s/authentication-configuration.yaml".text = authenticationConfig;
@@ -151,19 +163,19 @@ in
         shutdownGracePeriodCriticalPods = "1m";
       };
       role = config.platform.k3s.role;
+      serverAddr = lib.mkIf (!config.platform.k3s.isBootstrapNode) "https://k3s.murtazau.xyz:6443";
       extraFlags = [
-        "--tls-san k3s.murtazau.xyz"
-        "--secrets-encryption"
         "--node-ip ${config.platform.k3s.nodeIP}"
+        "--kube-proxy-arg metrics-bind-address=0.0.0.0"
+      ] ++ lib.optionals isServer [
+        "--disable traefik,local-storage"
+        "--secrets-encryption"
+        "--tls-san k3s.murtazau.xyz"
+        "--kube-apiserver-arg anonymous-auth=false"
+        "--kube-apiserver-arg authentication-config=${config.environment.etc."k3s/authentication-configuration.yaml".source}"
         "--kube-controller-manager-arg bind-address=0.0.0.0"
         "--kube-scheduler-arg bind-address=0.0.0.0"
-        "--kube-proxy-arg metrics-bind-address=0.0.0.0"
-        "--kube-apiserver-arg anonymous-auth=false"
-        "--disable traefik,local-storage"
-      ]
-      ++ lib.optional isServer ''
-        --kube-apiserver-arg authentication-config=${config.environment.etc."k3s/authentication-configuration.yaml".source}
-      '';
+      ];
       manifests.oidc-cluster-role-binding = lib.mkIf isServer {
         enable = true;
         target = "oidc-admin-cluster-role-binding.yaml";
