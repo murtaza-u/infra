@@ -13,6 +13,12 @@ spec:
   dependsOn:
     - name: kyverno
       namespace: kyverno
+  healthCheckExprs:
+    - apiVersion: kyverno.io/v1
+      kind: ClusterPolicy
+      failed: metadata.name == 'longhorn-add-nixos-path' && status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'False')
+      current: metadata.name == 'longhorn-add-nixos-path' && status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'True')
+  wait: true
   interval: 1m0s
   path: ./kubernetes/infrastructure/homelab/longhorn
   prune: true
