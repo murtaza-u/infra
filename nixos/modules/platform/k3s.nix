@@ -137,6 +137,14 @@ in
         });
         description = "List of OIDC admin subjects";
       };
+      installLonghornDependencies = lib.mkOption {
+        type = lib.types.bool;
+        description = ''
+          Install longhorn dependencies as described in
+          https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/networking/cluster/k3s/docs/examples/STORAGE.md
+        '';
+        default = false;
+      };
     };
   };
   config = lib.mkIf config.platform.k3s.enable {
@@ -153,6 +161,11 @@ in
     environment.etc = lib.mkIf isServer {
       "k3s/authentication-configuration.yaml".text = authenticationConfig;
     };
+    environment.systemPackages = lib.mkIf config.platform.k3s.installLonghornDependencies [ pkgs.nfs-utils ];
+    services.openiscsi = lib.mkIf config.platform.k3s.installLonghornDependencies {
+      enable = true;
+      name = "${config.networking.hostName}-initiatorhost";
+    };
     services.k3s = {
       enable = true;
       package = config.platform.k3s.package;
@@ -168,7 +181,7 @@ in
         "--node-ip ${config.platform.k3s.nodeIP}"
         "--kube-proxy-arg metrics-bind-address=0.0.0.0"
       ] ++ lib.optionals isServer [
-        "--disable traefik,local-storage"
+        "--disable local-storage"
         "--secrets-encryption"
         "--tls-san k3s.murtazau.xyz"
         "--kube-apiserver-arg anonymous-auth=false"

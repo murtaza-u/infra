@@ -71,6 +71,7 @@ in
           name = "oci:${infra.oci_icds.value.oidc_client_id}";
         }
       ];
+      installLonghornDependencies = true;
     };
   };
 

@@ -50,6 +50,7 @@ in
       package = extraArgs.unstable.k3s_1_34;
       role = "agent";
       nodeIP = infra.oci_instances.value."srv-oci-1".private_ip;
+      installLonghornDependencies = true;
     };
   };
 
