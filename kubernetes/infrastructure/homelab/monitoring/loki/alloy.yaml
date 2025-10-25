@@ -29,7 +29,7 @@ spec:
         # Ref:
         #   - https://grafana.com/docs/alloy/latest/reference/components/loki/loki.source.journal/
         #   - https://grafana.com/docs/alloy/latest/collect/logs-in-kubernetes/
-        content: >-
+        content: |
           loki.write "default" {
             endpoint {
               url = "http://monitoring-loki-gateway.monitoring.svc.cluster.local/loki/api/v1/push"
