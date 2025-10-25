@@ -28,6 +28,12 @@ spec:
           ports:
             - containerPort: 8080
               name: http
+          env:
+            - name: NTFY_AUTH_USERS
+              valueFrom:
+                secretKeyRef:
+                  key: NTFY_AUTH_USERS
+                  name: ntfy-users
           volumeMounts:
             - name: config
               mountPath: /etc/ntfy/server.yml

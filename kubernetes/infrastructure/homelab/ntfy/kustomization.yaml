@@ -5,6 +5,7 @@ resources:
   - ../../base/ntfy
   - ingress.yaml
   - servicemonitor.yaml
+  - ntfy-users-sealed.yaml
   - alertfy
 configMapGenerator:
   - name: ntfy

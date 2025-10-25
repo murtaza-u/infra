@@ -1,0 +1,12 @@
+# yaml-language-server: $schema=https://github.com/datreeio/CRDs-catalog/raw/refs/heads/main/bitnami.com/sealedsecret_v1alpha1.json
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: ntfy-users
+spec:
+  encryptedData:
+    NTFY_AUTH_USERS: AgAr1pjH80NEQqo/oanGAhAlCbneI94vnrluUnEw0dlJWUjUA9wn8iQP9sGjLMzi/jwXoAEGYU1Xv+9uxu3Rqgg3VXyeD3vG0IrqS60rPcuFe8HkeDpwdYlUpL6w7dHLHWUC56xoLqM63a5VmwC8CEgrScncJ+V2vR5jPbYeYBCyKqRWBGPDfu3NbzxQGFjWFCJ13gCLC3FL50R9esCiIP4Mocwzz1YrjrLGNGxIpRihVKojjx94CHs8nb9qXDr+n8PBTHdY8e/eSVj9GJPLHatA1nNGLrvdXZAQ3G7rhAeH8wEmZ/jcr/Edme7/P/XWd1SX7CFn8VWKMSpc7ybV0AMxRYiOHPRbJlfwsUWsRdEQIfYSN1UI0flVMhSpFgMxB4kqPPqT3sbHn3K3uiyMJ/a1VxPO1s5Lpty+gwyAKCCYpsvuUcxWpyvoCqH3QtiU/OHP9Rgsqu8czpwWeMUSLQcbwLT8JWVtVbkORTcDUKOYOZczHp7hINEEoQWqhud5iGH2GA/BfU4mG1b1lfRX3pcr3KPA6vlfkP2dNNf/SIvpxNqiFRowWI8cwfJzoXTdKY0SLwRdWJE1rHRRSmUO8meBhNgy0G+gbT4yFOfnfGUNWY/o8sXiThH9oB3x5tQDk43roqbpX1BuvTmzJdRyRPEahNqNJ8SUsHKB8C1rfRl9Jnf1Hc+1RXbe74hgnp1xA8iXCb0U6QTo/1AB5xT04L7u8D5FI+5Aj21yrrvbEgSBgJAAns7uUp5IrmUIhMtZ+x62mluqL5s8ewOGM2yZJ/G8K3Rwullm1ShWJFt4NzBfqAzgEx7TKSXcDTkxS0nMQoZItCrOU5KfWSkRY9KEXQ0OqfTkbZFahEnKI5P1MAUQpK/DTS9XsU6LwIfDQTIdIA+lSAVvizZYVCxI
+  template:
+    metadata:
+      name: ntfy-users
+    type: Opaque
