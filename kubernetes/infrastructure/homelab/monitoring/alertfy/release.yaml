@@ -13,11 +13,6 @@ spec:
       sourceRef:
         kind: GitRepository
         name: alertfy
-  dependsOn:
-    - name: sealed-secrets
-      namespace: sealed-secrets
-    - name: ntfy
-      namespace: ntfy
   interval: 1m0s
   values:
     replicaCount: 1

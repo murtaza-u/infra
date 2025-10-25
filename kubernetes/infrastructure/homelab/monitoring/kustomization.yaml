@@ -6,4 +6,4 @@ resources:
   - kube-prometheus-stack
   - loki
   - ntfy.yaml
-  - alertfy
+  - alertfy.yaml
