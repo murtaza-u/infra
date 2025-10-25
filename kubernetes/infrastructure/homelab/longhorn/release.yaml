@@ -14,9 +14,6 @@ spec:
         kind: HelmRepository
         name: longhorn
       version: v1.10.x
-  dependsOn:
-    - name: kyverno
-      namespace: kyverno
   interval: 1m0s
   install:
     crds: Create
