@@ -11,6 +11,10 @@ configMapGenerator:
     files:
       - server.yml
 namespace: ntfy
+images:
+  - name: ntfy
+    newName: binwiederhier/ntfy
+    newTag: v2.14
 patches:
   - target:
       group: apps
