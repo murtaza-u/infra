@@ -8,7 +8,6 @@ spec:
   chart:
     spec:
       chart: loki
-      interval: 10m0s
       reconcileStrategy: ChartVersion
       sourceRef:
         kind: HelmRepository
