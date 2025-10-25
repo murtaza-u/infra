@@ -11,7 +11,7 @@ metadata:
   namespace: kyverno
 spec:
   interval: 1m0s
-  path: ./infrastructure/homelab/kyverno
+  path: ./kubernetes/infrastructure/homelab/kyverno
   prune: true
   sourceRef:
     kind: GitRepository

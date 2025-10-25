@@ -14,7 +14,7 @@ spec:
     - name: kyverno
       namespace: kyverno
   interval: 1m0s
-  path: ./infrastructure/homelab/longhorn
+  path: ./kubernetes/infrastructure/homelab/longhorn
   prune: true
   sourceRef:
     kind: GitRepository

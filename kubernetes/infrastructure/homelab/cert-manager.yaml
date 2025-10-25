@@ -14,7 +14,7 @@ spec:
     - name: monitoring
       namespace: monitoring
   interval: 1m0s
-  path: ./infrastructure/homelab/cert-manager
+  path: ./kubernetes/infrastructure/homelab/cert-manager
   prune: true
   sourceRef:
     kind: GitRepository

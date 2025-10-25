@@ -14,7 +14,7 @@ spec:
     - name: longhorn
       namespace: longhorn-system
   interval: 1m0s
-  path: ./infrastructure/homelab/monitoring
+  path: ./kubernetes/infrastructure/homelab/monitoring
   prune: true
   sourceRef:
     kind: GitRepository

@@ -6,7 +6,7 @@ metadata:
   namespace: cert-manager
 spec:
   interval: 10m0s
-  path: ./infrastructure/homelab/cert-manager/controller
+  path: ./kubernetes/infrastructure/homelab/cert-manager/controller
   prune: true
   sourceRef:
     kind: GitRepository
@@ -24,7 +24,7 @@ spec:
   dependsOn:
     - name: cert-manager-controller
   interval: 10m0s
-  path: ./infrastructure/homelab/cert-manager/issuers
+  path: ./kubernetes/infrastructure/homelab/cert-manager/issuers
   prune: true
   sourceRef:
     kind: GitRepository

@@ -18,7 +18,7 @@ spec:
     - name: monitoring
       namespace: monitoring
   interval: 1m0s
-  path: ./infrastructure/homelab/ntfy
+  path: ./kubernetes/infrastructure/homelab/ntfy
   prune: true
   sourceRef:
     kind: GitRepository
