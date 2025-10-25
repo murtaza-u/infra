@@ -15,8 +15,6 @@ spec:
         name: grafana
       version: 6.x.x
   dependsOn:
-    - name: longhorn
-      namespace: longhorn-system
     - name: kube-prometheus-stack
       namespace: monitoring
   install:

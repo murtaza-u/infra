@@ -5,5 +5,3 @@ resources:
   - namespace.yaml
   - kube-prometheus-stack
   - loki
-  - ntfy.yaml
-  - alertfy.yaml

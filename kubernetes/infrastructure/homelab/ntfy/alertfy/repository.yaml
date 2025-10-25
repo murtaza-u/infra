@@ -3,7 +3,7 @@ apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
   name: alertfy
-  namespace: monitoring
+  namespace: ntfy
 spec:
   interval: 10m0s
   ref:

@@ -14,13 +14,6 @@ spec:
         kind: HelmRepository
         name: cert-manager
       version: 1.x.x
-  dependsOn:
-    # Do not deploy cert-manager until the kube-prometheus-stack is deployed.
-    # The cert-manager chart deploys a ServiceMonitor, whose CRD is provided by
-    # the kube-prometheus-stack. Therefore, the kube-prometheus-stack chart
-    # must be deployed before cert-manager.
-    - name: kube-prometheus-stack
-      namespace: monitoring
   install:
     crds: Create
     createNamespace: true

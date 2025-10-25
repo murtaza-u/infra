@@ -14,9 +14,6 @@ spec:
         kind: HelmRepository
         name: grafana
       version: 1.x.x
-  dependsOn:
-    - name: loki
-      namespace: monitoring
   install:
     crds: Create
   interval: 1m0s

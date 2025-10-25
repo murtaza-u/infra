@@ -14,9 +14,6 @@ spec:
         kind: HelmRepository
         name: prometheus-community
       version: 78.x.x
-  dependsOn:
-    - name: longhorn
-      namespace: longhorn-system
   install:
     crds: Create
     createNamespace: true
