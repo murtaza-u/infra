@@ -128,6 +128,21 @@ resource "oci_core_network_security_group" "k3s_agent_node" {
   display_name   = "K3S agent node"
 }
 
+resource "oci_core_network_security_group_security_rule" "flannel_cni_vxlan" {
+  network_security_group_id = oci_core_network_security_group.k3s_node.id
+  direction                 = "INGRESS"
+  protocol                  = "17" # udp
+  description               = "Flannel CNI with VXLAN"
+  source                    = oci_core_network_security_group.k3s_node.id
+  source_type               = "NETWORK_SECURITY_GROUP"
+  udp_options {
+    destination_port_range {
+      min = 8472
+      max = 8472
+    }
+  }
+}
+
 resource "oci_core_network_security_group_security_rule" "kubernetes_api" {
   network_security_group_id = oci_core_network_security_group.k3s_server_node.id
   direction                 = "INGRESS"
@@ -158,21 +173,6 @@ resource "oci_core_network_security_group_security_rule" "kubelet_metrics" {
   }
 }
 
-resource "oci_core_network_security_group_security_rule" "flannel_cni_vxlan" {
-  network_security_group_id = oci_core_network_security_group.k3s_node.id
-  direction                 = "INGRESS"
-  protocol                  = "17" # udp
-  description               = "Flannel CNI with VXLAN"
-  source                    = oci_core_network_security_group.k3s_node.id
-  source_type               = "NETWORK_SECURITY_GROUP"
-  udp_options {
-    destination_port_range {
-      min = 8472
-      max = 8472
-    }
-  }
-}
-
 resource "oci_core_network_security_group_security_rule" "node_exporter_metrics" {
   network_security_group_id = oci_core_network_security_group.k3s_node.id
   direction                 = "INGRESS"
@@ -184,6 +184,51 @@ resource "oci_core_network_security_group_security_rule" "node_exporter_metrics"
     destination_port_range {
       min = 9100
       max = 9100
+    }
+  }
+}
+
+resource "oci_core_network_security_group_security_rule" "kube_proxy_metrics" {
+  network_security_group_id = oci_core_network_security_group.k3s_node.id
+  direction                 = "INGRESS"
+  protocol                  = "6" # tcp
+  description               = "Kube Proxy Metrics"
+  source                    = oci_core_network_security_group.k3s_node.id
+  source_type               = "NETWORK_SECURITY_GROUP"
+  tcp_options {
+    destination_port_range {
+      min = 10249
+      max = 10249
+    }
+  }
+}
+
+resource "oci_core_network_security_group_security_rule" "kube_controller_mgr_metrics" {
+  network_security_group_id = oci_core_network_security_group.k3s_server_node.id
+  direction                 = "INGRESS"
+  protocol                  = "6" # tcp
+  description               = "Kube Controller Manager Metrics"
+  source                    = oci_core_network_security_group.k3s_node.id
+  source_type               = "NETWORK_SECURITY_GROUP"
+  tcp_options {
+    destination_port_range {
+      min = 10257
+      max = 10257
+    }
+  }
+}
+
+resource "oci_core_network_security_group_security_rule" "kube_scheduler_metrics" {
+  network_security_group_id = oci_core_network_security_group.k3s_server_node.id
+  direction                 = "INGRESS"
+  protocol                  = "6" # tcp
+  description               = "Kube Scheduler Metrics"
+  source                    = oci_core_network_security_group.k3s_node.id
+  source_type               = "NETWORK_SECURITY_GROUP"
+  tcp_options {
+    destination_port_range {
+      min = 10259
+      max = 10259
     }
   }
 }
