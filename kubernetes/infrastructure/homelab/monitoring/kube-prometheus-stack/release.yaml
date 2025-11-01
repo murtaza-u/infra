@@ -193,7 +193,8 @@ spec:
       enabled: true
       # If your kube controller manager is not deployed as a pod, specify IPs
       # it can be found on
-      endpoints: []
+      endpoints:
+        - 10.0.0.10
       service:
         enabled: true
         port: 10257
@@ -216,7 +217,8 @@ spec:
       enabled: true
       # If your kube scheduler is not deployed as a pod, specify IPs it can be
       # found on
-      endpoints: []
+      endpoints:
+        - 10.0.0.10
       service:
         enabled: true
         port: 10259
@@ -229,7 +231,9 @@ spec:
     kubeProxy:
       enabled: true
       # If your kube proxy is not deployed as a pod, specify IPs it can be found on
-      endpoints: []
+      endpoints:
+        - 10.0.0.10
+        - 10.0.0.11
       service:
         enabled: true
         port: 10249

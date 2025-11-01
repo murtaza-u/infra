@@ -210,6 +210,7 @@ resource "oci_core_instance" "srv_oci_instances" {
     assign_private_dns_record = false
     assign_public_ip          = true
     subnet_id                 = oci_core_subnet.kubernetes_cluster.id
+    private_ip                = "10.0.0.${count.index + 10}"
     nsg_ids = [
       oci_core_network_security_group.k3s_node.id,
       count.index == 0 ? oci_core_network_security_group.k3s_server_node.id : oci_core_network_security_group.k3s_agent_node.id
