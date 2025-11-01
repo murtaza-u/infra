@@ -12,7 +12,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: grafana
-      version: 6.x.x
+      version: 6.44.x
   dependsOn:
     - name: kube-prometheus-stack
       namespace: monitoring
@@ -72,6 +72,16 @@ spec:
         # Keep a little bit lower than memory limits
         - name: GOMEMLIMIT
           value: 950MiB
+    chunksCache:
+      # Specifies whether memcached based chunks-cache should be enabled
+      #
+      # Disabled due to lack of sufficient resources
+      enabled: false
+    resultsCache:
+      # Specifies whether memcached based results-cache should be enabled
+      #
+      # Disabled due to lack of sufficient resources
+      enabled: false
     gateway:
       enabled: true
       replicas: 1
