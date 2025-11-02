@@ -89,6 +89,15 @@ resource "oci_core_security_list" "kubernetes_cluster" {
       max = 22
     }
   }
+  ingress_security_rules {
+    description = "Allow TCP port 25565 (minecraft)"
+    source      = "0.0.0.0/0"
+    protocol    = "6" # tcp
+    tcp_options {
+      min = 25565
+      max = 25565
+    }
+  }
 }
 
 data "oci_identity_availability_domains" "kubernetes_cluster" {

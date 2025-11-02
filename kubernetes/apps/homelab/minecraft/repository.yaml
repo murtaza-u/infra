@@ -1,0 +1,8 @@
+# yaml-language-server: $schema=https://github.com/datreeio/CRDs-catalog/raw/refs/heads/main/source.toolkit.fluxcd.io/helmrepository_v1.json
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: itzg-minecraft
+  namespace: minecraft
+spec:
+  url: https://itzg.github.io/minecraft-server-charts/

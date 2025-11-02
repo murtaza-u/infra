@@ -1,0 +1,86 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/refs/heads/main/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: minecraft
+  namespace: minecraft
+spec:
+  chart:
+    spec:
+      chart: minecraft
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: itzg-minecraft
+      version: 5.0.0
+  install:
+    crds: Create
+  interval: 1m
+  upgrade:
+    crds: CreateReplace
+  values:
+    image:
+      repository: itzg/minecraft-server
+      tag: stable
+      pullPolicy: Always
+    resources:
+      requests:
+        memory: 2Gi
+        cpu: 250m
+      limits:
+        memory: 2.5Gi
+        cpu: 500m
+    startupProbe:
+      enabled: true
+      failureThreshold: 60
+      periodSeconds: 10
+    minecraftServer:
+      eula: "TRUE"
+      # One of: LATEST, SNAPSHOT, or a specific version (ie: "1.7.9").
+      version: "1.21.10"
+      # Ref: https://docker-minecraft-server.readthedocs.io/en/latest/types-and-platforms
+      type: "FABRIC"
+      # One of: peaceful, easy, normal, and hard
+      difficulty: normal
+      # A comma-separated list of player names to whitelist.
+      whitelist: "movingdystopia"
+      # A comma-separated list of player names who should be admins.
+      ops: "movingdystopia"
+      # One of: creative, survival, adventure, spectator
+      gameMode: survival
+      # Define this if you want a specific map generation seed.
+      levelSeed: null
+      # Message of the Day
+      motd: "Welcome to Minecraft on Kubernetes!"
+      # If you adjust this, you may need to adjust resources.requests above to
+      # match.
+      memory: 2048M
+      # A list of Modrinth project slugs with optional version after colon
+      modrinth:
+        projects:
+          - fabric-api
+          - floodgate
+        # Specifies whether to download Modrinth dependencies.
+        # The allowed values are: none, required, optional
+        downloadDependencies: required
+        # The version type is used to determine the newest version to use from
+        # each project.
+        # The allowed values are: release, beta, alpha
+        allowedVersionType: release
+      rcon:
+        enabled: true
+        # By default, the container will generate a random password at startup
+        # to ensure internal RCON tooling, including a backup container, can
+        # be used, but the password is secure.
+        withGeneratedPassword: true
+      # Kubernetes Service type: "ClusterIP", "NodePort", "LoadBalancer".
+      serviceType: LoadBalancer
+      # Set the external port of the service, usefull when using the
+      # LoadBalancer service type
+      servicePort: 25565
+    persistence:
+      dataDir:
+        enabled: true
+        Size: 1Gi
+        accessModes:
+          - ReadWriteOnce
