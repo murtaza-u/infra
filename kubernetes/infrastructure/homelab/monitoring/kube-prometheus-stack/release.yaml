@@ -69,7 +69,7 @@ spec:
         # expected size.
         replicas: 1
         # Time duration Alertmanager shall retain data for. Default is '120h'.
-        retention: 48h
+        retention: 24h
         # Storage is the definition of how storage will be used by the
         # Alertmanager instances.
         storage:
@@ -347,4 +347,4 @@ spec:
                 - ReadWriteOnce
               resources:
                 requests:
-                  storage: 5Gi
+                  storage: 35Gi
