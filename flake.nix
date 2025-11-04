@@ -35,12 +35,7 @@
       (system:
         let
           pkgs = import nixpkgs { inherit system; };
-          unstable = import inputs.unstable-nixpkgs {
-            inherit system;
-            config.allowUnfreePredicate = p: builtins.elem (pkgs.lib.getName p) [
-              "terraform"
-            ];
-          };
+          unstable = import inputs.unstable-nixpkgs { inherit system; };
         in
         {
           formatter = pkgs.nixpkgs-fmt;
@@ -63,7 +58,7 @@
                 kubeseal
                 oci-cli
                 terraform-ls
-                terraform
+                opentofu
                 just
                 jq
                 openssl

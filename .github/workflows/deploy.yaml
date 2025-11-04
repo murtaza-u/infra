@@ -35,26 +35,26 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v5
 
-      - name: Setup terraform
-        uses: hashicorp/setup-terraform@v3
+      - name: Setup OpenTofu
+        uses: opentofu/setup-opentofu@v1
         with:
-          terraform_version: "~1.13.0"
+          tofu_version: "1.10.6"
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-      - name: Terraform init
+      - name: OpenTofu init
         run: |
           for config_path in terraform/*; do
             pushd "$config_path"
-            terraform init -input=false
+            tofu init -input=false
             popd
           done
 
-      - name: Terraform check formatting
+      - name: OpenTofu check formatting
         continue-on-error: true
         run: |
           for config_path in terraform/*; do
             pushd "$config_path"
-            terraform fmt -check
+            tofu fmt -check
             popd
           done
 
@@ -62,14 +62,14 @@ jobs:
         run: |
           for config_path in terraform/*; do
             pushd "$config_path"
-            terraform validate -no-color
+            tofu validate -no-color
             popd
           done
 
       - name: Setup TFLint
         uses: terraform-linters/setup-tflint@v6
         with:
-          tflint_version: v0.58.1
+          tflint_version: v0.59.1
 
       - name: Init TFLint
         run: tflint --init
@@ -85,7 +85,7 @@ jobs:
       - name: Terraform Plan OCI
         run: |
           pushd "terraform/oci"
-          terraform plan -no-color
+          tofu plan -no-color
           popd
   deploy:
     runs-on: ubuntu-latest
@@ -106,18 +106,18 @@ jobs:
           path: terraform/oci/state
         continue-on-error: true
 
-      - name: Setup terraform
-        uses: hashicorp/setup-terraform@v3
+      - name: Setup OpenTofu
+        uses: opentofu/setup-opentofu@v1
         with:
-          terraform_version: "~1.13.0"
+          tofu_version: "1.10.6"
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
       - name: Provision Oracle Cloud Infrastructure (OCI) resources
         run: |
           pushd terraform/oci
-          terraform init -input=false
-          terraform apply -auto-approve
-          terraform output -json > ../../infra.json
+          tofu init -input=false
+          tofu apply -auto-approve
+          tofu output -json > ../../infra.json
           popd
 
       - name: Setup nix
@@ -232,8 +232,8 @@ jobs:
           export TF_VAR_oci_identity_domain_id="$(jq -r '.oci_icds.value.identity_domain_id' infra.json)"
           export TF_VAR_oci_identity_domain_app_id="$(jq -r '.oci_icds.value.app_id' infra.json)"
           pushd terraform/flux
-          terraform init -input=false
-          terraform apply -auto-approve
+          tofu init -input=false
+          tofu apply -auto-approve
           popd
 
       # not necessary, as github-hosted runners are ephemeral and get destroyed
