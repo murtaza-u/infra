@@ -49,7 +49,7 @@ spec:
       # One of: creative, survival, adventure, spectator
       gameMode: survival
       # Define this if you want a specific map generation seed.
-      levelSeed: null
+      levelSeed: "162908589731396808"
       # Message of the Day
       motd: "Welcome to Minecraft on Kubernetes!"
       # If you adjust this, you may need to adjust resources.requests above to
