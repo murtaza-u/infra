@@ -1,7 +1,7 @@
 {
   description = "Self-hosted adventures, experiments, fun.";
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
     unstable-nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-registry = {
       url = "github:nixos/flake-registry";

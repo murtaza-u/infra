@@ -12,15 +12,18 @@
     kernelParams = [
       "consoleblank=120" # turn off the screen after 2 minutes of inactivity
     ];
-    # Setting GRUB boot loader (legacy bios system).
-    loader.grub.enable = true;
+    loader = {
+      # Setting GRUB boot loader (legacy bios system).
+      grub.enable = true;
+      timeout = 0;
+    };
   };
 
   # Disable suspend.
   # We are using a laptop as a server here, so we want it to keep running even
   # when the lid is closed.
   systemd.targets.sleep.enable = false;
-  services.logind.lidSwitch = "ignore";
+  services.logind.settings.Login.HandleLidSwitch = "ignore";
 
   networking = {
     hostName = "srv-onprem-0";
@@ -100,8 +103,8 @@
       enable = true;
       credentialsFile = config.sops.templates."transmission/settings.json".path;
     };
-    arr.enable = true;
-    jellyseerr.enable = true;
+    arr.enable = false;
+    jellyseerr.enable = false;
     jellyfin.enable = true;
     syncthing.enable = true;
     aria2.enable = true;
@@ -132,5 +135,5 @@
     };
   };
 
-  system.stateVersion = "25.05";
+  system.stateVersion = "25.11";
 }
