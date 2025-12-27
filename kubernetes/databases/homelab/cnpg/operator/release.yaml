@@ -1,0 +1,41 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/refs/heads/main/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cnpg
+  namespace: cnpg-system
+spec:
+  chart:
+    spec:
+      chart: cloudnative-pg
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: cnpg
+      version: 0.27.x
+  install:
+    crds: Create
+    createNamespace: true
+  interval: 1m
+  targetNamespace: cnpg-system
+  upgrade:
+    crds: CreateReplace
+  values:
+    replicaCount: 1
+    crds:
+      create: true
+    resources:
+      requests:
+        cpu: 10m
+        memory: 50Mi
+      limits:
+        cpu: 10m
+        memory: 100Mi
+    monitoring:
+      podMonitorEnabled: true
+      grafanaDashboard:
+        create: true
+        namespace: ""
+        configMapName: "cnpg-grafana-dashboard"
+        labels:
+          grafana_dashboard: "1"
