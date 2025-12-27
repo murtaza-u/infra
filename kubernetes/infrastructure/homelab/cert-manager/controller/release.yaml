@@ -103,11 +103,11 @@ spec:
       # Resources to provide to the cert-manager cainjector pod.
       resources:
         requests:
-          cpu: 5m
-          memory: 25Mi
-        limits:
-          cpu: 5m
+          cpu: 10m
           memory: 50Mi
+        limits:
+          cpu: 10m
+          memory: 120Mi
     # This startupapicheck is a Helm post-install hook that waits for the
     # webhook endpoints to become available.
     # The check is implemented using a Kubernetes Job - if you are injecting
