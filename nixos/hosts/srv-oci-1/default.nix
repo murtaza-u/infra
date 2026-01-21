@@ -1,4 +1,4 @@
-{ lib, extraArgs, ... }:
+{ lib, config, extraArgs, ... }:
 let
   infra = lib.importJSON (builtins.getEnv "TF_OUTPUT_JSON");
 in
@@ -32,6 +32,10 @@ in
         owner = "root";
         group = "root";
       };
+      "tailscale/auth_keys/srv_oci_1" = {
+        mode = "0400";
+        owner = "root";
+      };
     };
   };
 
@@ -44,6 +48,11 @@ in
     ssh.enable = true;
     # enable timesyncd service
     synctime.enable = true;
+    # tailscale
+    tailscale = {
+      enable = true;
+      authKeyFile = config.sops.secrets."tailscale/auth_keys/srv_oci_1".path;
+    };
     # setup K3S
     k3s = {
       enable = true;

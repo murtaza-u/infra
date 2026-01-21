@@ -188,6 +188,8 @@ in
         "--kube-apiserver-arg authentication-config=${config.environment.etc."k3s/authentication-configuration.yaml".source}"
         "--kube-controller-manager-arg bind-address=0.0.0.0"
         "--kube-scheduler-arg bind-address=0.0.0.0"
+      ] ++ lib.optionals config.platform.tailscale.enable [
+        "--flannel-iface tailscale0"
       ];
       manifests.oidc-cluster-role-binding = lib.mkIf isServer {
         enable = true;
