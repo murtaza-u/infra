@@ -37,3 +37,7 @@ spec:
         create: true
         namespace: ""
         configMapName: "cnpg-grafana-dashboard"
+    webhook:
+      startupProbe:
+        failureThreshold: 30
+        periodSeconds: 10
