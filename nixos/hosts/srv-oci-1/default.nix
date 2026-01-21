@@ -58,7 +58,8 @@ in
       enable = true;
       package = extraArgs.unstable.k3s_1_34;
       role = "agent";
-      nodeIP = infra.oci_instances.value."srv-oci-1".private_ip;
+      # nodeIP = infra.oci_instances.value."srv-oci-1".private_ip;
+      nodeInternalDNS = "srv-oci-1.tadpole-stonecat.ts.net";
       installLonghornDependencies = true;
     };
   };

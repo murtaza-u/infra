@@ -59,7 +59,8 @@ in
       package = extraArgs.unstable.k3s_1_34;
       role = "server";
       isBootstrapNode = true;
-      nodeIP = infra.oci_instances.value."srv-oci-0".private_ip;
+      # nodeIP = infra.oci_instances.value."srv-oci-0".private_ip;
+      nodeInternalDNS = "srv-oci-0.tadpole-stonecat.ts.net";
       oidcIssuerURL = infra.oci_icds.value.oidc_issuer_url;
       oidcDiscoveryURL = infra.oci_icds.value.oidc_discovery_url;
       oidcClientID = infra.oci_icds.value.oidc_client_id;

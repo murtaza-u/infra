@@ -1,6 +1,8 @@
 { pkgs, lib, config, ... }:
 let
   isServer = config.platform.k3s.role == "server";
+  hasNodeIP = config.platform.k3s.nodeIP != null;
+  hasNodeInternalDNS = config.platform.k3s.nodeInternalDNS != null;
   authenticationConfig = lib.generators.toYAML { } {
     apiVersion = "apiserver.config.k8s.io/v1beta1";
     kind = "AuthenticationConfiguration";
@@ -61,6 +63,11 @@ in
       nodeIP = lib.mkOption {
         type = lib.types.nullOr lib.types.str;
         description = "IPv4/IPv6 addresses to advertise for node.";
+        default = null;
+      };
+      nodeInternalDNS = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        description = "Internal DNS addresses to advertise for node";
         default = null;
       };
       oidcIssuerURL = lib.mkOption {
@@ -178,8 +185,11 @@ in
       role = config.platform.k3s.role;
       serverAddr = lib.mkIf (!config.platform.k3s.isBootstrapNode) "https://k3s.murtazau.xyz:6443";
       extraFlags = [
-        "--node-ip ${config.platform.k3s.nodeIP}"
         "--kube-proxy-arg metrics-bind-address=0.0.0.0"
+      ] ++ lib.optionals hasNodeIP [
+        "--node-ip ${config.platform.k3s.nodeIP}"
+      ] ++ lib.optionals hasNodeInternalDNS [
+        "--node-internal-dns ${config.platform.k3s.nodeInternalDNS}"
       ] ++ lib.optionals isServer [
         "--disable local-storage"
         "--secrets-encryption"
