@@ -59,7 +59,6 @@
                 oci-cli
                 terraform-ls
                 opentofu
-                just
                 jq
                 openssl
                 inputs.nixos-anywhere.packages.${system}.nixos-anywhere
