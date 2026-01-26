@@ -31,6 +31,14 @@ spec:
       limits:
         cpu: 10m
         memory: 100Mi
+    # potential fix for api server request timeouts
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: node-role.kubernetes.io/control-plane
+              operator: Exists
     monitoring:
       podMonitorEnabled: true
       grafanaDashboard:
@@ -41,3 +49,7 @@ spec:
       startupProbe:
         failureThreshold: 30
         periodSeconds: 10
+      livenessProbe:
+        initialDelaySeconds: 10
+      readinessProbe:
+        initialDelaySeconds: 10
