@@ -6,10 +6,10 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: infrastructure
-      namespace: flux-system
-    - name: databases
-      namespace: flux-system
+  - name: infrastructure
+    namespace: flux-system
+  - name: databases
+    namespace: flux-system
   interval: 1m
   path: ./kubernetes/apps/homelab
   prune: true

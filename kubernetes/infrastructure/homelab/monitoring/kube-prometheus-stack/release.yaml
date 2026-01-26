@@ -53,17 +53,17 @@ spec:
           repeat_interval: 12h
           receiver: 'null'
           routes:
-            - receiver: 'null'
-              matchers:
-                - alertname = "Watchdog"
-            - receiver: 'ntfy'
-              continue: true
+          - receiver: 'null'
+            matchers:
+            - alertname = "Watchdog"
+          - receiver: 'ntfy'
+            continue: true
         receivers:
-          - name: 'null'
-          - name: 'ntfy'
-            webhook_configs:
-              - send_resolved: true
-                url: http://alertfy-svc.ntfy.svc.cluster.local/hook
+        - name: 'null'
+        - name: 'ntfy'
+          webhook_configs:
+          - send_resolved: true
+            url: http://alertfy-svc.ntfy.svc.cluster.local/hook
       alertmanagerSpec:
         # Size is the expected size of the alertmanager cluster. The controller
         # will eventually make the size of the running cluster equal to the
@@ -79,7 +79,7 @@ spec:
               # use default storage class
               storageClassName: null
               accessModes:
-                - ReadWriteOnce
+              - ReadWriteOnce
               resources:
                 requests:
                   storage: 1Gi
@@ -128,15 +128,15 @@ spec:
         # Hostnames.
         # Must be provided if Ingress is enable.
         hosts:
-          - grafana.murtazau.xyz
+        - grafana.murtazau.xyz
         # Path for grafana ingress
         path: /
         # TLS configuration for grafana Ingress
         # Secret must be manually created in the namespace
         tls:
-          - secretName: grafana-tls
-            hosts:
-              - grafana.murtazau.xyz
+        - secretName: grafana-tls
+          hosts:
+          - grafana.murtazau.xyz
       # To make Grafana persistent (Using Statefulset)
       persistence:
         enabled: true
@@ -144,10 +144,10 @@ spec:
         # use default storage class
         storageClassName: null
         accessModes:
-          - ReadWriteOnce
+        - ReadWriteOnce
         size: 3Gi
         finalizers:
-          - kubernetes.io/pvc-protection
+        - kubernetes.io/pvc-protection
       sidecar:
         dashboards:
           enabled: true
@@ -167,12 +167,12 @@ spec:
       ## Configure additional grafana datasources (passed through tpl)
       ## ref: http://docs.grafana.org/administration/provisioning/#datasources
       additionalDataSources:
-        - name: loki
-          access: proxy
-          basicAuth: false
-          editable: false
-          type: loki
-          url: "http://monitoring-loki-gateway.monitoring.svc.cluster.local"
+      - name: loki
+        access: proxy
+        basicAuth: false
+        editable: false
+        type: loki
+        url: "http://monitoring-loki-gateway.monitoring.svc.cluster.local"
       # Flag to mark provisioned data sources for deletion if they are no
       # longer configured. It takes no effect if data sources are already
       # listed in the deleteDatasources section.
@@ -195,7 +195,7 @@ spec:
       # If your kube controller manager is not deployed as a pod, specify IPs
       # it can be found on
       endpoints:
-        - 10.0.0.10
+      - 10.0.0.10
       service:
         enabled: true
         port: 10257
@@ -219,7 +219,7 @@ spec:
       # If your kube scheduler is not deployed as a pod, specify IPs it can be
       # found on
       endpoints:
-        - 10.0.0.10
+      - 10.0.0.10
       service:
         enabled: true
         port: 10259
@@ -233,8 +233,8 @@ spec:
       enabled: true
       # If your kube proxy is not deployed as a pod, specify IPs it can be found on
       endpoints:
-        - 10.0.0.10
-        - 10.0.0.11
+      - 10.0.0.10
+      - 10.0.0.11
       service:
         enabled: true
         port: 10249
@@ -256,10 +256,10 @@ spec:
           enabled: false
     prometheus-node-exporter:
       tolerations:
-        - key: availability
-          operator: Equal
-          value: low
-          effect: NoExecute
+      - key: availability
+        operator: Equal
+        value: low
+        effect: NoExecute
     # Manages Prometheus and Alertmanager components
     prometheusOperator:
       enabled: true
@@ -345,7 +345,7 @@ spec:
               # use default storage class
               storageClassName: null
               accessModes:
-                - ReadWriteOnce
+              - ReadWriteOnce
               resources:
                 requests:
                   storage: 35Gi

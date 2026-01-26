@@ -11,12 +11,12 @@ metadata:
   namespace: ntfy
 spec:
   dependsOn:
-    - name: sealed-secrets
-      namespace: sealed-secrets
-    - name: longhorn
-      namespace: longhorn-system
-    - name: monitoring
-      namespace: monitoring
+  - name: sealed-secrets
+    namespace: sealed-secrets
+  - name: longhorn
+    namespace: longhorn-system
+  - name: monitoring
+    namespace: monitoring
   interval: 1m
   path: ./kubernetes/infrastructure/homelab/ntfy
   prune: true

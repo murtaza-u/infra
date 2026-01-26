@@ -21,38 +21,38 @@ spec:
         runAsNonRoot: true
         fsGroup: 1001
       containers:
-        - name: ntfy
-          image: binwiederhier/ntfy
-          args:
-            - serve
-          ports:
-            - containerPort: 8080
-              name: http
-          env:
-            - name: NTFY_AUTH_USERS
-              valueFrom:
-                secretKeyRef:
-                  key: NTFY_AUTH_USERS
-                  name: ntfy-users
-          volumeMounts:
-            - name: config
-              mountPath: /etc/ntfy/server.yml
-              subPath: server.yml
-              readOnly: true
-            - name: data
-              mountPath: /data
-          securityContext:
-            allowPrivilegeEscalation: false
-            privileged: false
-      volumes:
+      - name: ntfy
+        image: binwiederhier/ntfy
+        args:
+        - serve
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: NTFY_AUTH_USERS
+          valueFrom:
+            secretKeyRef:
+              key: NTFY_AUTH_USERS
+              name: ntfy-users
+        volumeMounts:
         - name: config
-          configMap:
-            name: ntfy
+          mountPath: /etc/ntfy/server.yml
+          subPath: server.yml
+          readOnly: true
+        - name: data
+          mountPath: /data
+        securityContext:
+          allowPrivilegeEscalation: false
+          privileged: false
+      volumes:
+      - name: config
+        configMap:
+          name: ntfy
   volumeClaimTemplates:
-    - metadata:
-        name: data
-      spec:
-        accessModes: ["ReadWriteOnce"]
-        resources:
-          requests:
-            storage: 1Gi
+  - metadata:
+      name: data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 1Gi

@@ -23,7 +23,7 @@ metadata:
   namespace: kyverno
 spec:
   dependsOn:
-    - name: kyverno-controllers
+  - name: kyverno-controllers
   interval: 1m
   path: ./kubernetes/infrastructure/homelab/kyverno/policies
   prune: true

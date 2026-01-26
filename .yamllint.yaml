@@ -1,8 +1,10 @@
 extends: default
 ignore:
-  - kubernetes/clusters/**/flux-system/
-  - secrets.yaml
+- kubernetes/clusters/**/flux-system/
+- secrets.yaml
 rules:
+  indentation:
+    indent-sequences: false
   line-length:
     ignore: "*"
   comments:

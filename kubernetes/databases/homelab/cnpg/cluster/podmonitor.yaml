@@ -8,4 +8,4 @@ spec:
     matchLabels:
       cnpg.io/cluster: default
   podMetricsEndpoints:
-    - port: metrics
+  - port: metrics

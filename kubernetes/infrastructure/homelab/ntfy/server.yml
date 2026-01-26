@@ -93,7 +93,7 @@ cache-duration: "12h"
 auth-file: /data/auth.db
 auth-default-access: "deny-all"
 auth-access:
-  - "alertmanager:alertmanager:wo"
+- "alertmanager:alertmanager:wo"
 # auth-startup-queries:
 
 # If set, the X-Forwarded-For header is used to determine the visitor IP address

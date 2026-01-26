@@ -11,6 +11,6 @@ spec:
       name: letsencrypt-prod
     # enable the HTTP-01 challenge provider
     solvers:
-      - http01:
-          ingress:
-            ingressClassName: traefik
+    - http01:
+        ingress:
+          ingressClassName: traefik

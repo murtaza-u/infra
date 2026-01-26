@@ -40,12 +40,12 @@ spec:
           priority: |
             Status == "firing" ? "urgent" : "default"
           tags:
-            - tag: "rotating_light,construction"
-              condition: |
-                Status == "firing"
-            - tag: "white_check_mark,confetti_ball"
-              condition: |
-                Status == "resolved"
+          - tag: "rotating_light,construction"
+            condition: |
+              Status == "firing"
+          - tag: "white_check_mark,confetti_ball"
+            condition: |
+              Status == "resolved"
           title: |
             {{ if eq .Status "resolved" }}Resolved: {{ end }}{{ index .Annotations "summary" }}
           description: |-

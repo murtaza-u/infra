@@ -11,8 +11,8 @@ metadata:
   namespace: cert-manager
 spec:
   dependsOn:
-    - name: monitoring
-      namespace: monitoring
+  - name: monitoring
+    namespace: monitoring
   interval: 1m
   path: ./kubernetes/infrastructure/homelab/cert-manager
   prune: true

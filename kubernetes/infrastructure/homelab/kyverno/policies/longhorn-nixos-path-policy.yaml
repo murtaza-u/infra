@@ -13,23 +13,23 @@ metadata:
       PATH is explicitly set to support NixOS based systems.
 spec:
   rules:
-    - name: add-env-vars
-      match:
-        resources:
-          kinds:
-            - Pod
-          namespaces:
-            - longhorn-system
-      mutate:
-        patchStrategicMerge:
-          spec:
-            initContainers:
-              - (name): "*"
-                envFrom:
-                  - configMapRef:
-                      name: longhorn-nixos-path
-            containers:
-              - (name): "*"
-                envFrom:
-                  - configMapRef:
-                      name: longhorn-nixos-path
+  - name: add-env-vars
+    match:
+      resources:
+        kinds:
+        - Pod
+        namespaces:
+        - longhorn-system
+    mutate:
+      patchStrategicMerge:
+        spec:
+          initContainers:
+          - (name): "*"
+            envFrom:
+            - configMapRef:
+                name: longhorn-nixos-path
+          containers:
+          - (name): "*"
+            envFrom:
+            - configMapRef:
+                name: longhorn-nixos-path

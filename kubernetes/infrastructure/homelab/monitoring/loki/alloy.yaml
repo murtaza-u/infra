@@ -14,8 +14,8 @@ spec:
         name: grafana
       version: 1.x.x
   dependsOn:
-    - name: kube-prometheus-stack
-      namespace: monitoring
+  - name: kube-prometheus-stack
+    namespace: monitoring
   install:
     crds: Create
   interval: 1m

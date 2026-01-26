@@ -4,7 +4,7 @@ name: Deploy infrastructure using Terraform & NixOS
 on:
   push:
     branches:
-      - main
+    - main
   pull_request:
 
 permissions:
@@ -32,221 +32,221 @@ jobs:
       run:
         shell: bash
     steps:
-      - name: Checkout source code
-        uses: actions/checkout@v5
+    - name: Checkout source code
+      uses: actions/checkout@v5
 
-      - name: Setup OpenTofu
-        uses: opentofu/setup-opentofu@v1
-        with:
-          tofu_version: "1.10.6"
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+    - name: Setup OpenTofu
+      uses: opentofu/setup-opentofu@v1
+      with:
+        tofu_version: "1.10.6"
+        cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-      - name: OpenTofu init
-        run: |
-          for config_path in terraform/*; do
-            pushd "$config_path"
-            tofu init -input=false
-            popd
-          done
-
-      - name: OpenTofu check formatting
-        continue-on-error: true
-        run: |
-          for config_path in terraform/*; do
-            pushd "$config_path"
-            tofu fmt -check
-            popd
-          done
-
-      - name: Terraform validate
-        run: |
-          for config_path in terraform/*; do
-            pushd "$config_path"
-            tofu validate -no-color
-            popd
-          done
-
-      - name: Setup TFLint
-        uses: terraform-linters/setup-tflint@v6
-        with:
-          tflint_version: v0.59.1
-
-      - name: Init TFLint
-        run: tflint --init
-
-      - name: Run TFLint
-        run: |
-          for config_path in terraform/*; do
-            pushd "$config_path"
-            tflint
-            popd
-          done
-
-      - name: Terraform Plan OCI
-        run: |
-          pushd "terraform/oci"
-          tofu plan -no-color
+    - name: OpenTofu init
+      run: |
+        for config_path in terraform/*; do
+          pushd "$config_path"
+          tofu init -input=false
           popd
+        done
+
+    - name: OpenTofu check formatting
+      continue-on-error: true
+      run: |
+        for config_path in terraform/*; do
+          pushd "$config_path"
+          tofu fmt -check
+          popd
+        done
+
+    - name: Terraform validate
+      run: |
+        for config_path in terraform/*; do
+          pushd "$config_path"
+          tofu validate -no-color
+          popd
+        done
+
+    - name: Setup TFLint
+      uses: terraform-linters/setup-tflint@v6
+      with:
+        tflint_version: v0.59.1
+
+    - name: Init TFLint
+      run: tflint --init
+
+    - name: Run TFLint
+      run: |
+        for config_path in terraform/*; do
+          pushd "$config_path"
+          tflint
+          popd
+        done
+
+    - name: Terraform Plan OCI
+      run: |
+        pushd "terraform/oci"
+        tofu plan -no-color
+        popd
   deploy:
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
     needs:
-      - terraform-ci
+    - terraform-ci
     if: github.ref_name == 'main'
     steps:
-      - name: Checkout source code
-        uses: actions/checkout@v5
+    - name: Checkout source code
+      uses: actions/checkout@v5
 
-      - name: Restore state
-        uses: actions/download-artifact@v4
-        with:
-          name: new-instances
-          path: terraform/oci/state
-        continue-on-error: true
+    - name: Restore state
+      uses: actions/download-artifact@v4
+      with:
+        name: new-instances
+        path: terraform/oci/state
+      continue-on-error: true
 
-      - name: Setup OpenTofu
-        uses: opentofu/setup-opentofu@v1
-        with:
-          tofu_version: "1.10.6"
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+    - name: Setup OpenTofu
+      uses: opentofu/setup-opentofu@v1
+      with:
+        tofu_version: "1.10.6"
+        cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-      - name: Provision Oracle Cloud Infrastructure (OCI) resources
-        run: |
-          pushd terraform/oci
-          tofu init -input=false
-          tofu apply -auto-approve
-          tofu output -json > ../../infra.json
-          popd
+    - name: Provision Oracle Cloud Infrastructure (OCI) resources
+      run: |
+        pushd terraform/oci
+        tofu init -input=false
+        tofu apply -auto-approve
+        tofu output -json > ../../infra.json
+        popd
 
-      - name: Setup nix
-        uses: nixbuild/nix-quick-install-action@v34
-        with:
-          github_access_token: ${{ secrets.GITHUB_TOKEN }}
-          enable_kvm: true
-          nix_conf: |
-            extra-platforms = aarch64-linux
-            keep-env-derivations = true
-            keep-outputs = true
+    - name: Setup nix
+      uses: nixbuild/nix-quick-install-action@v34
+      with:
+        github_access_token: ${{ secrets.GITHUB_TOKEN }}
+        enable_kvm: true
+        nix_conf: |
+          extra-platforms = aarch64-linux
+          keep-env-derivations = true
+          keep-outputs = true
 
-      - name: Setup QEMU
-        uses: docker/setup-qemu-action@v3
+    - name: Setup QEMU
+      uses: docker/setup-qemu-action@v3
 
-      - name: Restore and save Nix store
-        uses: nix-community/cache-nix-action@v6
-        with:
-          # restore and save a cache using this key
-          primary-key: nix-${{ runner.os }}-${{ hashFiles('**/*.nix', '**/flake.lock') }}
-          # if there's no cache hit, restore a cache by this prefix
-          restore-prefixes-first-match: nix-${{ runner.os }}-
-          paths: |
-            result
+    - name: Restore and save Nix store
+      uses: nix-community/cache-nix-action@v6
+      with:
+        # restore and save a cache using this key
+        primary-key: nix-${{ runner.os }}-${{ hashFiles('**/*.nix', '**/flake.lock') }}
+        # if there's no cache hit, restore a cache by this prefix
+        restore-prefixes-first-match: nix-${{ runner.os }}-
+        paths: |
+          result
 
-      - name: Deploy NixOS
-        id: deploy
-        run: |
-          set -uo pipefail
+    - name: Deploy NixOS
+      id: deploy
+      run: |
+        set -uo pipefail
 
-          # setup ssh keys
-          echo "${{ secrets.SSH_IDENTITY_FILE_INSTALL }}" > /tmp/homelab-install
-          echo "${{ secrets.SSH_IDENTITY_FILE_OPS }}" > /tmp/homelab-ops
-          chmod 600 /tmp/homelab-install /tmp/homelab-ops
+        # setup ssh keys
+        echo "${{ secrets.SSH_IDENTITY_FILE_INSTALL }}" > /tmp/homelab-install
+        echo "${{ secrets.SSH_IDENTITY_FILE_OPS }}" > /tmp/homelab-ops
+        chmod 600 /tmp/homelab-install /tmp/homelab-ops
 
-          export SSH_HOST_KEY=$(</tmp/homelab-ops)
-          export TF_OUTPUT_JSON="$PWD/infra.json"
+        export SSH_HOST_KEY=$(</tmp/homelab-ops)
+        export TF_OUTPUT_JSON="$PWD/infra.json"
 
-          success_hosts=()
-          failed=0
-          fresh_installs=0
+        success_hosts=()
+        failed=0
+        fresh_installs=0
 
-          mapfile -t hosts < <(jq -r '.oci_instances.value | to_entries[] | "\(.key) \(.value.public_ip)"' "$TF_OUTPUT_JSON")
+        mapfile -t hosts < <(jq -r '.oci_instances.value | to_entries[] | "\(.key) \(.value.public_ip)"' "$TF_OUTPUT_JSON")
 
-          for entry in "${hosts[@]}"; do
-            host="${entry%% *}"
-            ip="${entry##* }"
-            echo "[*] Processing host: $host ($ip)"
+        for entry in "${hosts[@]}"; do
+          host="${entry%% *}"
+          ip="${entry##* }"
+          echo "[*] Processing host: $host ($ip)"
 
-            # nixos-anywhere
-            if [[ -f "terraform/oci/state/${host}.new" ]]; then
-              echo "[+] Detected new instance: $host"
-              ./run.sh install "$host" "opc@$ip" /tmp/homelab-install
-              if [[ "$?" == 0 ]]; then
-                rm terraform/oci/state/${host}.new
-                success_hosts+=("$host")
-                fresh_installs=$((fresh_installs + 1))
-              else
-                failed=1
-                echo "[!] Install failed: $host"
-              fi
-              continue
-            fi
-
-            # nixos-rebuild
-            echo "[+] Existing instance: $host"
-            ./run.sh switch "$host" "ops@$ip" /tmp/homelab-ops
-            if [[ "$?" != 0 ]]; then
+          # nixos-anywhere
+          if [[ -f "terraform/oci/state/${host}.new" ]]; then
+            echo "[+] Detected new instance: $host"
+            ./run.sh install "$host" "opc@$ip" /tmp/homelab-install
+            if [[ "$?" == 0 ]]; then
+              rm terraform/oci/state/${host}.new
+              success_hosts+=("$host")
+              fresh_installs=$((fresh_installs + 1))
+            else
               failed=1
-              echo "[!] Rebuild failed: $host"
+              echo "[!] Install failed: $host"
             fi
-          done
-
-          echo "success_hosts=${success_hosts[*]}" >> "$GITHUB_OUTPUT"
-          echo "fresh_installs=${fresh_installs}" >> "$GITHUB_OUTPUT"
-
-          if [[ "$failed" == 1 ]]; then
-            exit 1
+            continue
           fi
 
-      - name: Commit hardware.nix
-        if: steps.deploy.outputs.success_hosts != ''
-        run: |
-          nix fmt .
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add nixos/hosts/**/hardware.nix
-          git commit -m "feat: add hardware.nix from nixos-anywhere" || echo "No changes to commit"
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:${{ github.ref_name }}
+          # nixos-rebuild
+          echo "[+] Existing instance: $host"
+          ./run.sh switch "$host" "ops@$ip" /tmp/homelab-ops
+          if [[ "$?" != 0 ]]; then
+            failed=1
+            echo "[!] Rebuild failed: $host"
+          fi
+        done
 
-      - name: Wait for DNS resolution
-        env:
-          DOMAIN: ${{ vars.CLOUDFLARE_DNS_RECORD }}
-        run: |
-          for i in {1..30}; do
-            if dig +short "$DOMAIN" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$'; then
-              echo "DNS resolved: $DOMAIN"
-              exit 0
-            fi
-            echo "DNS resolution failed. Retrying in 30s..."
-            sleep 30s
-          done
-          echo "DNS resolution failed. Giving up"
+        echo "success_hosts=${success_hosts[*]}" >> "$GITHUB_OUTPUT"
+        echo "fresh_installs=${fresh_installs}" >> "$GITHUB_OUTPUT"
+
+        if [[ "$failed" == 1 ]]; then
           exit 1
+        fi
 
-      - name: Provision FluxCD on the cluster
-        run: |
-          if [[ ${{ steps.deploy.outputs.fresh_installs }} -gt 0 ]]; then
-            echo "waiting 5m for the cluster to be up (hack)..."
-            sleep 5m
+    - name: Commit hardware.nix
+      if: steps.deploy.outputs.success_hosts != ''
+      run: |
+        nix fmt .
+        git config user.name "github-actions"
+        git config user.email "github-actions@github.com"
+        git add nixos/hosts/**/hardware.nix
+        git commit -m "feat: add hardware.nix from nixos-anywhere" || echo "No changes to commit"
+        git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:${{ github.ref_name }}
+
+    - name: Wait for DNS resolution
+      env:
+        DOMAIN: ${{ vars.CLOUDFLARE_DNS_RECORD }}
+      run: |
+        for i in {1..30}; do
+          if dig +short "$DOMAIN" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "DNS resolved: $DOMAIN"
+            exit 0
           fi
-          export TF_VAR_oci_identity_domain_id="$(jq -r '.oci_icds.value.identity_domain_id' infra.json)"
-          export TF_VAR_oci_identity_domain_app_id="$(jq -r '.oci_icds.value.app_id' infra.json)"
-          pushd terraform/flux
-          tofu init -input=false
-          tofu apply -auto-approve
-          popd
+          echo "DNS resolution failed. Retrying in 30s..."
+          sleep 30s
+        done
+        echo "DNS resolution failed. Giving up"
+        exit 1
 
-      # not necessary, as github-hosted runners are ephemeral and get destroyed
-      # once the job completes. However, keeping this step doesn't hurt. In the
-      # future, if I switch to self-hosted (likely non-ephemeral) runners, this
-      # will be useful
-      - name: Destroy secrets from file system
-        if: always()
-        run: shred -u /tmp/homelab-install /tmp/homelab-ops 2>/dev/null
+    - name: Provision FluxCD on the cluster
+      run: |
+        if [[ ${{ steps.deploy.outputs.fresh_installs }} -gt 0 ]]; then
+          echo "waiting 5m for the cluster to be up (hack)..."
+          sleep 5m
+        fi
+        export TF_VAR_oci_identity_domain_id="$(jq -r '.oci_icds.value.identity_domain_id' infra.json)"
+        export TF_VAR_oci_identity_domain_app_id="$(jq -r '.oci_icds.value.app_id' infra.json)"
+        pushd terraform/flux
+        tofu init -input=false
+        tofu apply -auto-approve
+        popd
 
-      - name: Persist state
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: new-instances
-          path: terraform/oci/state
+    # not necessary, as github-hosted runners are ephemeral and get destroyed
+    # once the job completes. However, keeping this step doesn't hurt. In the
+    # future, if I switch to self-hosted (likely non-ephemeral) runners, this
+    # will be useful
+    - name: Destroy secrets from file system
+      if: always()
+      run: shred -u /tmp/homelab-install /tmp/homelab-ops 2>/dev/null
+
+    - name: Persist state
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: new-instances
+        path: terraform/oci/state

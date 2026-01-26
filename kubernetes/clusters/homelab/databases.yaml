@@ -6,8 +6,8 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: infrastructure
-      namespace: flux-system
+  - name: infrastructure
+    namespace: flux-system
   interval: 1m
   path: ./kubernetes/databases/homelab
   prune: true

@@ -23,7 +23,7 @@ metadata:
   namespace: cert-manager
 spec:
   dependsOn:
-    - name: cert-manager-controller
+  - name: cert-manager-controller
   interval: 1m
   path: ./kubernetes/infrastructure/homelab/cert-manager/issuers
   prune: true

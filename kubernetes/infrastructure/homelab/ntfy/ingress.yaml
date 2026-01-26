@@ -7,17 +7,17 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-    - host: ntfy.murtazau.xyz
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: ntfy
-                port:
-                  number: 80
+  - host: ntfy.murtazau.xyz
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ntfy
+            port:
+              number: 80
   tls:
-    - hosts:
-        - ntfy.murtazau.xyz
-      secretName: ntfy-tls
+  - hosts:
+    - ntfy.murtazau.xyz
+    secretName: ntfy-tls

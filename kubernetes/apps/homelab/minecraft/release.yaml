@@ -81,4 +81,4 @@ spec:
         enabled: true
         Size: 1Gi
         accessModes:
-          - ReadWriteOnce
+        - ReadWriteOnce

@@ -13,10 +13,10 @@ spec:
   interval: 1m
   path: ./kubernetes/infrastructure/homelab/kyverno
   healthCheckExprs:
-    - apiVersion: kyverno.io/v1
-      kind: ClusterPolicy
-      failed: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'False')
-      current: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'True')
+  - apiVersion: kyverno.io/v1
+    kind: ClusterPolicy
+    failed: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'False')
+    current: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'True')
   prune: true
   wait: true
   sourceRef:

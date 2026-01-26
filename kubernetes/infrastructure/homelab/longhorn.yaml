@@ -19,8 +19,8 @@ metadata:
   namespace: longhorn-system
 spec:
   dependsOn:
-    - name: kyverno
-      namespace: kyverno
+  - name: kyverno
+    namespace: kyverno
   interval: 1m
   path: ./kubernetes/infrastructure/homelab/longhorn
   prune: true

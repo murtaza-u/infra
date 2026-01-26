@@ -23,7 +23,7 @@ metadata:
   namespace: cnpg-system
 spec:
   dependsOn:
-    - name: cnpg-operator
+  - name: cnpg-operator
   interval: 1m
   path: ./kubernetes/databases/homelab/cnpg/cluster
   prune: true

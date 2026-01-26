@@ -6,8 +6,8 @@ metadata:
     release: monitoring-kube-prometheus-stack
 spec:
   endpoints:
-    - path: /metrics
-      port: metrics
+  - path: /metrics
+    port: metrics
   selector:
     matchLabels:
       app: ntfy

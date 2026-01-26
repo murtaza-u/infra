@@ -9,7 +9,7 @@ spec:
   selector:
     app: ntfy
   ports:
-    - name: http
-      protocol: TCP
-      port: 80
-      targetPort: http
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: http

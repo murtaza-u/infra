@@ -11,8 +11,8 @@ metadata:
   namespace: monitoring
 spec:
   dependsOn:
-    - name: longhorn
-      namespace: longhorn-system
+  - name: longhorn
+    namespace: longhorn-system
   interval: 1m
   path: ./kubernetes/infrastructure/homelab/monitoring
   prune: true
