@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=https://github.com/datreeio/CRDs-catalog/raw/refs/heads/main/source.toolkit.fluxcd.io/ocirepository_v1.json
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: n8n
+  namespace: n8n
+spec:
+  interval: 5m
+  url: "oci://8gears.container-registry.com/library/n8n"
+  ref:
+    semver: "2.0.x"

@@ -1,0 +1,99 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/refs/heads/main/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: n8n
+  namespace: n8n
+spec:
+  interval: 1m
+  chartRef:
+    kind: OCIRepository
+    name: n8n
+  install:
+    crds: Create
+  upgrade:
+    crds: CreateReplace
+  values:
+    image:
+      repository: n8nio/n8n
+      pullPolicy: IfNotPresent
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: "2.4.6"
+
+    ingress:
+      enabled: true
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+      className: "traefik"
+      hosts:
+      - host: n8n.murtazau.xyz
+        paths:
+        - path: /
+          pathType: Prefix
+      tls:
+      - hosts:
+        - n8n.murtazau.xyz
+        secretName: n8n-tls
+
+    # The main (n8n) application related configuration + Kubernetes specific settings
+    # The config: {} dictionary is converted to environmental variables in the ConfigMap.
+    main:
+      # See https://docs.n8n.io/hosting/configuration/environment-variables/ for all values.
+      config:
+        db:
+          postgresdb:
+            host: default-rw.cnpg-system.svc.cluster.local
+            database:
+              file: /run/secrets/n8n/postgres/database
+            user:
+              file: /run/secrets/n8n/postgres/username
+            password:
+              file: /run/secrets/n8n/postgres/password
+
+      # N8n Kubernetes specific settings
+      persistence:
+        # If true, use a Persistent Volume Claim, If false, use emptyDir
+        enabled: true
+        # what type volume, possible options are [existing, emptyDir, dynamic].
+        # - dynamic for Dynamic Volume Provisioning
+        # - existing for using an existing Claim
+        type: dynamic
+        # Persistent Volume Storage Class
+        storageClass: null
+        # Persistent Volume Access Mode
+        accessModes:
+        - ReadWriteOnce
+        # Persistent Volume size
+        size: 1Gi
+
+      extraVolumes:
+      - name: postgres-credential
+        secret:
+          secretName: n8n-postgres-credential
+          items:
+          - key: database
+            path: database
+          - key: username
+            path: username
+          - key: password
+            path: password
+
+      extraVolumeMounts:
+      - name: postgres-credential
+        mountPath: /run/secrets/n8n/postgres
+        readOnly: true
+
+      resources:
+        requests:
+          memory: 2Gi
+        limits:
+          memory: 4Gi
+
+      serviceAccount:
+        create: false
+
+    worker:
+      enabled: false
+
+    webhook:
+      enabled: false

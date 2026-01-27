@@ -24,3 +24,12 @@ resource "cloudflare_dns_record" "ntfy" {
   content = oci_core_instance.srv_oci_instances[0].public_ip
   zone_id = var.cloudfare_zone_id
 }
+
+resource "cloudflare_dns_record" "n8n" {
+  name    = "n8n.${var.cloudflare_domain}"
+  proxied = false
+  type    = "A"
+  ttl     = 1 # auto
+  content = oci_core_instance.srv_oci_instances[0].public_ip
+  zone_id = var.cloudfare_zone_id
+}
