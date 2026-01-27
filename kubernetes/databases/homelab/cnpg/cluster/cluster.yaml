@@ -6,12 +6,6 @@ metadata:
   namespace: cnpg-system
 spec:
   instances: 1
-  bootstrap:
-    initdb:
-      database: n8n
-      owner: n8n
-      secret:
-        name: n8n-user-credential
   resources:
     requests:
       memory: 1Gi
