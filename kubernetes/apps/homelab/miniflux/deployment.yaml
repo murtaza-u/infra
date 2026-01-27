@@ -25,6 +25,18 @@ spec:
           value: "1"
         - name: BASE_URL
           value: https://miniflux.murtazau.xyz
+        - name: CREATE_ADMIN
+          value: "1"
+        - name: ADMIN_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: miniflux-admin-credential
+              key: username
+        - name: ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: miniflux-admin-credential
+              key: password
         - name: POSTGRES_DATABASE
           valueFrom:
             secretKeyRef:

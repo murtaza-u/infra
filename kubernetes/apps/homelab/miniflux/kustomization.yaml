@@ -8,6 +8,7 @@ images:
 resources:
 - namespace.yaml
 - postgres-credential.yaml
+- miniflux-admin-credential.yaml
 - deployment.yaml
 - service.yaml
 - ingress.yaml
