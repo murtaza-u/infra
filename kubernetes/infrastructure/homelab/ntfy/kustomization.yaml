@@ -26,10 +26,10 @@ patches:
       path: /spec/template/spec/containers/0/resources
       value:
         requests:
-          cpu: 10m
+          cpu: 100m
           memory: 25Mi
         limits:
-          cpu: 10m
+          cpu: 200m
           memory: 50Mi
     - op: add
       path: /spec/template/spec/containers/0/ports/1
