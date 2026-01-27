@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://www.schemastore.org/kustomization.json
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: miniflux
+images:
+- name: miniflux/miniflux
+  newTag: 2.2.16
+resources:
+- namespace.yaml
+- postgres-credential.yaml
+- deployment.yaml
+- service.yaml
+- ingress.yaml

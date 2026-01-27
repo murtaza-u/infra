@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: miniflux
+spec:
+  selector:
+    matchLabels:
+      app: miniflux
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: miniflux
+    spec:
+      containers:
+      - name: miniflux
+        image: miniflux/miniflux:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        env:
+        - name: PORT
+          value: "8080"
+        - name: RUN_MIGRATIONS
+          value: "1"
+        - name: BASE_URL
+          value: https://miniflux.murtazau.xyz
+        - name: POSTGRES_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: miniflux-postgres-credential
+              key: database
+        - name: POSTGRES_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: miniflux-postgres-credential
+              key: username
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: miniflux-postgres-credential
+              key: password
+        - name: DATABASE_URL
+          value: "postgres://$(POSTGRES_USERNAME):$(POSTGRES_PASSWORD)@default-rw.cnpg-system.svc.cluster.local/$(POSTGRES_DATABASE)?sslmode=disable"
