@@ -41,6 +41,7 @@ spec:
       # See https://docs.n8n.io/hosting/configuration/environment-variables/ for all values.
       config:
         db:
+          type: postgresdb
           postgresdb:
             host: default-rw.cnpg-system.svc.cluster.local
             database:
