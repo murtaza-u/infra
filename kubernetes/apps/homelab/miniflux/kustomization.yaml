@@ -12,3 +12,19 @@ resources:
 - deployment.yaml
 - service.yaml
 - ingress.yaml
+patches:
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: miniflux
+  patch: |-
+    - op: add
+      path: /spec/template/spec/containers/0/resources
+      value:
+        requests:
+          cpu: 100m
+          memory: 50Mi
+        limits:
+          cpu: 200m
+          memory: 100Mi
