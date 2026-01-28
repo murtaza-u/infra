@@ -94,6 +94,7 @@ auth-file: /data/auth.db
 auth-default-access: "deny-all"
 auth-access:
 - "alertmanager:alertmanager:wo"
+- "miniflux:rss-feeds:rw"
 # auth-startup-queries:
 
 # If set, the X-Forwarded-For header is used to determine the visitor IP address
