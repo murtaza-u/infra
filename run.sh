@@ -36,12 +36,22 @@ switch() {
 
     build "$host"
 
+    local system_path
+    system_path="$(readlink -f ./result)"
+
     export NIX_SSHOPTS="-i ${ssh_identity_file} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
-    nix-copy-closure --to "${target_host}" "$(readlink -f ./result)"
+
+    nix-copy-closure --to "${target_host}" "${system_path}"
+
     ssh -i "${ssh_identity_file}" \
         -o UserKnownHostsFile=/dev/null \
         -o StrictHostKeyChecking=no \
-        "${target_host}" "sudo $(readlink -f ./result)/bin/switch-to-configuration switch"
+        "${target_host}" <<EOF
+set -e
+sudo nix-env -p /nix/var/nix/profiles/system --set ${system_path}
+sudo ${system_path}/bin/switch-to-configuration switch
+sudo ${system_path}/bin/switch-to-configuration boot
+EOF
 }
 
 install() {
