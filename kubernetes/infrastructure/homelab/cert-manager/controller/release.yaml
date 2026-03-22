@@ -40,7 +40,6 @@ spec:
         cpu: 5m
         memory: 25Mi
       limits:
-        cpu: 10m
         memory: 50Mi
     prometheus:
       # Enable Prometheus monitoring for the cert-manager controller and
@@ -80,7 +79,6 @@ spec:
           cpu: 25m
           memory: 25Mi
         limits:
-          cpu: 25m
           memory: 50Mi
       # Enables default network policies for webhooks.
       networkPolicy:
@@ -106,7 +104,6 @@ spec:
           cpu: 10m
           memory: 50Mi
         limits:
-          cpu: 10m
           memory: 120Mi
     # This startupapicheck is a Helm post-install hook that waits for the
     # webhook endpoints to become available.

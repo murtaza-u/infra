@@ -29,7 +29,6 @@ spec:
         cpu: 10m
         memory: 50Mi
       limits:
-        cpu: 10m
         memory: 100Mi
     # potential fix for api server request timeouts
     affinity:

@@ -12,6 +12,5 @@ spec:
       cpu: 250m
     limits:
       memory: 1Gi
-      cpu: 250m
   storage:
     size: 2Gi

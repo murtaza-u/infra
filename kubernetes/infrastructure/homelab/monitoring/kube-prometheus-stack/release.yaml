@@ -89,7 +89,6 @@ spec:
             cpu: 20m
             memory: 25Mi
           limits:
-            cpu: 20m
             memory: 50Mi
     # Configuration for grafana
     grafana:
@@ -108,7 +107,6 @@ spec:
           cpu: 200m
           memory: 300Mi
         limits:
-          cpu: 200m
           memory: 400Mi
       # fix for https://github.com/prometheus-community/helm-charts/issues/3800
       serviceMonitor:
@@ -289,7 +287,6 @@ spec:
           cpu: 10m
           memory: 25Mi
         limits:
-          cpu: 20m
           memory: 60Mi
     # Deploy a Prometheus instance
     prometheus:
@@ -335,7 +332,6 @@ spec:
             cpu: 320m
             memory: 1Gi
           limits:
-            cpu: 320m
             memory: 2Gi
         # Prometheus StorageSpec for persistent data
         # ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/user-guides/storage.md

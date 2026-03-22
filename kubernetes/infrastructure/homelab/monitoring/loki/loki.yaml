@@ -66,7 +66,6 @@ spec:
           cpu: 350m
           memory: 800Mi
         limits:
-          cpu: 400m
           memory: 1Gi
       extraEnv:
       # Keep a little bit lower than memory limits
@@ -90,7 +89,6 @@ spec:
           cpu: 10m
           memory: 15Mi
         limits:
-          cpu: 10m
           memory: 25Mi
     # Zero out replica counts of other deployment modes
     backend:

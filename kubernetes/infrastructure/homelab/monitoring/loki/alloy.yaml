@@ -198,7 +198,6 @@ spec:
           cpu: 80m
           memory: 100Mi
         limits:
-          cpu: 100m
           memory: 150Mi
     controller:
       type: daemonset

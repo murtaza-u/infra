@@ -29,7 +29,6 @@ patches:
           cpu: 100m
           memory: 25Mi
         limits:
-          cpu: 200m
           memory: 50Mi
     - op: add
       path: /spec/template/spec/containers/0/ports/1
