@@ -52,6 +52,12 @@ variable "github_owner" {
   default     = "murtaza-u"
 }
 
+variable "github_username" {
+  description = "GitHub username associated with the token used for Flux bootstrap"
+  type        = string
+  default     = "murtaza-u"
+}
+
 variable "github_repository" {
   description = "GitHub repository name"
   type        = string

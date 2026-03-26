@@ -48,7 +48,7 @@ provider "flux" {
   git = {
     url = "https://github.com/${var.github_owner}/${var.github_repository}"
     http = {
-      username = "git"
+      username = var.github_username
       password = var.github_token
     }
     author_email = "bot@fluxcd.io"
