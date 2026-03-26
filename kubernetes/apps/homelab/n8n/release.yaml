@@ -18,22 +18,22 @@ spec:
       repository: n8nio/n8n
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "2.4.6"
+      tag: ""
 
     ingress:
-      enabled: false
-      annotations:
-        cert-manager.io/cluster-issuer: letsencrypt-prod
-      className: "traefik"
+      enabled: true
+      annotations: {}
+      # cert-manager.io/cluster-issuer: letsencrypt-prod
+      className: "tailscale"
       hosts:
-      - host: n8n.murtazau.xyz
+      - host: n8n
         paths:
         - path: /
           pathType: Prefix
       tls:
       - hosts:
-        - n8n.murtazau.xyz
-        secretName: n8n-tls
+        - n8n
+        # secretName: n8n-tls
 
     # The main (n8n) application related configuration + Kubernetes specific settings
     # The config: {} dictionary is converted to environmental variables in the ConfigMap.
