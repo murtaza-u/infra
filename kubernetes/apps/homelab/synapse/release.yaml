@@ -1,0 +1,82 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/refs/heads/main/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: synapse
+  namespace: synapse
+spec:
+  interval: 10m
+  chart:
+    spec:
+      chart: ./charts/matrix-stack
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: GitRepository
+        name: ess-helm
+      interval: 30m
+  install:
+    crds: Create
+  upgrade:
+    crds: CreateReplace
+  values:
+    serverName: matrix.tadpole-stonecat.ts.net
+
+    ingress:
+      className: tailscale
+      tlsEnabled: true
+
+    deploymentMarkers:
+      enabled: false
+
+    elementAdmin:
+      enabled: false
+
+    elementWeb:
+      enabled: false
+
+    matrixAuthenticationService:
+      enabled: false
+
+    matrixRTC:
+      enabled: false
+
+    postgres:
+      enabled: false
+
+    wellKnownDelegation:
+      enabled: false
+
+    initSecrets:
+      enabled: true
+
+    synapse:
+      enabled: true
+
+      ingress:
+        host: matrix.tadpole-stonecat.ts.net
+
+      postgres:
+        host: default-rw.cnpg-system.svc.cluster.local
+        port: 5432
+        database: synapse
+        user: synapse
+        password:
+          secret: synapse-postgres-credential
+          secretKey: password
+        sslMode: disable
+
+      media:
+        storage:
+          size: 5Gi
+
+      additional:
+        00-private-chat-only.yaml:
+          config: |-
+            report_stats: false
+            enable_registration: false
+            allow_public_rooms_without_auth: false
+            allow_public_rooms_over_federation: false
+            federation_domain_whitelist: []
+            trusted_key_servers: []
+            suppress_key_server_warning: true
+            url_preview_enabled: false
