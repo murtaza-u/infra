@@ -12,7 +12,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: itzg-minecraft
-      version: 5.0.0
+      version: 5.1.3
   install:
     crds: Create
   interval: 1m
@@ -37,7 +37,7 @@ spec:
     minecraftServer:
       eula: "TRUE"
       # One of: LATEST, SNAPSHOT, or a specific version (ie: "1.7.9").
-      version: "1.21.10"
+      version: "26.1.2"
       # Ref: https://docker-minecraft-server.readthedocs.io/en/latest/types-and-platforms
       type: "FABRIC"
       # One of: peaceful, easy, normal, and hard
@@ -49,7 +49,7 @@ spec:
       # One of: creative, survival, adventure, spectator
       gameMode: survival
       # Define this if you want a specific map generation seed.
-      levelSeed: "162908589731396808"
+      levelSeed: "2059666523504992"
       # Message of the Day
       motd: "Welcome to Minecraft on Kubernetes!"
       # If you adjust this, you may need to adjust resources.requests above to
@@ -76,6 +76,8 @@ spec:
       # Set the external port of the service, usefull when using the
       # LoadBalancer service type
       servicePort: 25565
+      # Expose via tailscale
+      loadBalancerClass: tailscale
     persistence:
       dataDir:
         enabled: true
