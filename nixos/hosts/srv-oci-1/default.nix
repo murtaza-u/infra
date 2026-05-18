@@ -56,7 +56,7 @@ in
     # setup K3S
     k3s = {
       enable = true;
-      package = extraArgs.unstable.k3s_1_34;
+      package = extraArgs.unstable.k3s_1_36;
       role = "agent";
       # nodeIP = infra.oci_instances.value."srv-oci-1".private_ip;
       nodeInternalDNS = "srv-oci-1.tadpole-stonecat.ts.net";

@@ -56,7 +56,7 @@ in
     # setup K3S
     k3s = {
       enable = true;
-      package = extraArgs.unstable.k3s_1_34;
+      package = extraArgs.unstable.k3s_1_36;
       role = "server";
       isBootstrapNode = true;
       # nodeIP = infra.oci_instances.value."srv-oci-0".private_ip;
