@@ -16,8 +16,14 @@ spec:
       interval: 30m
   install:
     crds: Create
+    timeout: 10m
+    remediation:
+      retries: -1
   upgrade:
     crds: CreateReplace
+    timeout: 10m
+    remediation:
+      retries: -1
   values:
     serverName: matrix.tadpole-stonecat.ts.net
 
