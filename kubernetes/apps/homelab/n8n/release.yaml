@@ -26,14 +26,13 @@ spec:
       # cert-manager.io/cluster-issuer: letsencrypt-prod
       className: "tailscale"
       hosts:
-      - host: n8n
+      - host: n8n.tadpole-stonecat.ts.net
         paths:
         - path: /
           pathType: Prefix
       tls:
       - hosts:
-        - n8n
-        # secretName: n8n-tls
+        - n8n.tadpole-stonecat.ts.net
 
     # The main (n8n) application related configuration + Kubernetes specific settings
     # The config: {} dictionary is converted to environmental variables in the ConfigMap.
