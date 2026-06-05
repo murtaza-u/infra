@@ -1,8 +1,9 @@
 {
   description = "Self-hosted adventures, experiments, fun.";
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
     unstable-nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    copyparty.url = "github:9001/copyparty";
     flake-registry = {
       url = "github:nixos/flake-registry";
       flake = false;
@@ -78,7 +79,10 @@
         };
         srv-oci-1 = mkSystem "srv-oci-1" rec {
           system = "aarch64-linux";
-          pkgs = import nixpkgs { inherit system; };
+          pkgs = import nixpkgs {
+            inherit system;
+            overlays = [ inputs.copyparty.overlays.default ];
+          };
           unstable = import inputs.unstable-nixpkgs { inherit system; };
         };
         srv-onprem-0 = mkSystem "srv-onprem-0" rec {
