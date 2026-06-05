@@ -242,6 +242,21 @@ resource "oci_core_network_security_group_security_rule" "kube_scheduler_metrics
   }
 }
 
+resource "oci_core_network_security_group_security_rule" "copyparty_backend" {
+  network_security_group_id = oci_core_network_security_group.k3s_agent_node.id
+  direction                 = "INGRESS"
+  protocol                  = "6" # tcp
+  description               = "Copyparty backend from k3s nodes"
+  source                    = oci_core_network_security_group.k3s_node.id
+  source_type               = "NETWORK_SECURITY_GROUP"
+  tcp_options {
+    destination_port_range {
+      min = 3923
+      max = 3923
+    }
+  }
+}
+
 data "oci_core_images" "oracle_linux" {
   compartment_id   = data.oci_identity_compartments.homelab.compartments[0].id
   operating_system = "Oracle Linux"
